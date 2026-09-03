@@ -11,8 +11,9 @@ public class Equipamento {
     private LocalDateTime criadoEm;
 
 
-    public Equipamento(){
-    }
+    public Equipamento(){}
+
+
     public int getId(){
         return id;
     }

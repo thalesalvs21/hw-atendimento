@@ -12,6 +12,7 @@ public class Cliente {
     private LocalDateTime criadoEm;
 
     public Cliente(){
+
     }
     public int getId(){
         return id;

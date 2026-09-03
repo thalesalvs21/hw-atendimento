@@ -12,8 +12,9 @@ public class Atendimento {
     private String descricao;
     private LocalDateTime criadoEm;
 
-    public Atendimento(){
-    }
+    public Atendimento(){}
+
+
     public int getId(){
         return id;
     }

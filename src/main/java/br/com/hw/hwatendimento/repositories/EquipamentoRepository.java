@@ -1,4 +1,4 @@
 package br.com.hw.hwatendimento.repositories;
 
-public interface EquipamentoRepository {
+public class EquipamentoRepository {
 }
