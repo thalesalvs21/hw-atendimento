@@ -17,7 +17,7 @@ create table if not exists equipamento(
   id int auto_increment primary key,
   modelo varchar(20) not null,
   numero_serie varchar(30) null,
-  cliente_id int null,
+  cliente_id int not null,
   criado_em datetime not null default current_timestamp,
   unique key uk_equipamento_serie (numero_serie),
   index ix_equipamento_modelo (modelo),
@@ -40,3 +40,6 @@ create table if not exists atendimento(
   constraint fk_atendimento_cliente
     foreign key (cliente_id) references cliente(id)
 );
+
+
+#alter table equipamento modify cliente_id int not null;
