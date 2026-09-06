@@ -30,7 +30,7 @@ public class ClienteRepository {
         return cliente;
     }
 
-    public Cliente inserirValores(Connection conexao, Cliente cliente) {
+    public Cliente inserirCliente(Connection conexao, Cliente cliente) {
         String sql = "insert into cliente (tipo, nome, nome_empresa, telefone) values (?, ?, ?, ?)";
 
         // Statement.RETURN_GENERATED_KEYS -> serve para pedir o id para o banco
@@ -63,7 +63,7 @@ public class ClienteRepository {
         cliente.setNomeEmpresa(null);
 
         ClienteRepository repo = new ClienteRepository();
-        repo.inserirValores(Conexao.conectar(), cliente);
+        repo.inserirCliente(Conexao.conectar(), cliente);
 
         System.out.println(cliente.getId());
 
