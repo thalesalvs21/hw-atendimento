@@ -11,8 +11,7 @@ public class HWApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HWApplication.class.getResource("atendimento-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 500, 450);
-        stage.setTitle("Teste");
+        Scene scene = new Scene(fxmlLoader.load());
         stage.setScene(scene);
         stage.show();
     }

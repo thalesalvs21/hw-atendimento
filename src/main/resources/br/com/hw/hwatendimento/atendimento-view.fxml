@@ -1,13 +1,206 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<!-- Apenas para teste, vai ser modificado-->
+<BorderPane prefHeight="720.0" prefWidth="1040.0" stylesheets="@style.css"
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="br.com.hw.hwatendimento.controller.AtendimentoController">
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="br.com.hw.hwatendimento.controller.AtendimentoController"
-            prefHeight="400.0" prefWidth="600.0">
-</AnchorPane>
+    <top>
+        <HBox styleClass="topbar">
+            <children>
+                <Label styleClass="brand-mark" text="HW" />
+                <Label styleClass="brand" text="Atendimento" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="lblDataHora" styleClass="topbar-meta" text="" />
+            </children>
+        </HBox>
+    </top>
+
+    <center>
+        <HBox>
+            <children>
+                <ScrollPane fitToWidth="true" styleClass="sheet-scroll" HBox.hgrow="ALWAYS">
+                    <content>
+                        <VBox spacing="16.0" styleClass="sheet">
+                            <children>
+
+                                <Label styleClass="page-title" text="Novo atendimento" />
+                                <Label styleClass="page-note" text="Comece pelo número de série do equipamento." />
+
+                                <VBox spacing="6.0">
+                                    <children>
+                                        <Label styleClass="field-label" text="Número de série" />
+                                        <HBox spacing="10.0">
+                                            <children>
+                                                <TextField fx:id="txtNumeroSerie" promptText="XX000000000" styleClass="serial-field" HBox.hgrow="ALWAYS" />
+                                                <Button fx:id="btnBuscar" mnemonicParsing="false" onAction="#buscarEquipamento" styleClass="btn-solid" text="Buscar" />
+                                            </children>
+                                        </HBox>
+                                        <Label fx:id="lblResultadoBusca" minHeight="16.0" styleClass="status" text="" />
+                                    </children>
+                                </VBox>
+
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <children>
+                                        <Label styleClass="section-name" text="Equipamento" />
+                                        <Separator HBox.hgrow="ALWAYS" />
+                                    </children>
+                                    <VBox.margin>
+                                        <Insets top="6.0" />
+                                    </VBox.margin>
+                                </HBox>
+
+                                <VBox spacing="6.0">
+                                    <children>
+                                        <Label styleClass="field-label" text="Modelo" />
+                                        <ComboBox fx:id="cmbModelo" maxWidth="Infinity" promptText="Selecione uma opção" />
+                                    </children>
+                                </VBox>
+
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <children>
+                                        <Label styleClass="section-name" text="Cliente" />
+                                        <Separator HBox.hgrow="ALWAYS" />
+                                    </children>
+                                    <VBox.margin>
+                                        <Insets top="6.0" />
+                                    </VBox.margin>
+                                </HBox>
+
+                                <HBox spacing="22.0">
+                                    <children>
+                                        <RadioButton fx:id="rbFisica" mnemonicParsing="false" selected="true" text="Pessoa física">
+                                            <toggleGroup>
+                                                <ToggleGroup fx:id="tipoCliente" />
+                                            </toggleGroup>
+                                        </RadioButton>
+                                        <RadioButton fx:id="rbJuridica" mnemonicParsing="false" text="Pessoa jurídica" toggleGroup="$tipoCliente" />
+                                    </children>
+                                </HBox>
+
+                                <VBox spacing="6.0">
+                                    <children>
+                                        <Label styleClass="field-label" text="Empresa" />
+                                        <TextField fx:id="txtEmpresa" maxWidth="Infinity" promptText="Somente para pessoa jurídica" />
+                                    </children>
+                                </VBox>
+
+                                <HBox spacing="16.0">
+                                    <children>
+                                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="Nome" />
+                                                <TextField fx:id="txtNome" maxWidth="Infinity" promptText="Insira o nome do cliente" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="Telefone" />
+                                                <TextField fx:id="txtTelefone" maxWidth="Infinity" promptText="(00) 00000-0000" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <children>
+                                        <Label styleClass="section-name" text="Atendimento" />
+                                        <Separator HBox.hgrow="ALWAYS" />
+                                    </children>
+                                    <VBox.margin>
+                                        <Insets top="6.0" />
+                                    </VBox.margin>
+                                </HBox>
+
+                                <HBox spacing="16.0">
+                                    <children>
+
+                                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="Início" />
+                                                <HBox spacing="8.0">
+                                                    <children>
+                                                        <DatePicker fx:id="dtInicio" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+                                                        <TextField fx:id="txtHoraInicio" maxWidth="72.0" minWidth="72.0" prefWidth="72.0" promptText="08:15" />
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+
+                                        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="Término" />
+                                                <HBox spacing="8.0">
+                                                    <children>
+                                                        <DatePicker fx:id="dtFim" maxWidth="Infinity" promptText="em aberto" HBox.hgrow="ALWAYS" />
+                                                        <TextField fx:id="txtHoraFim" maxWidth="72.0" minWidth="72.0" prefWidth="72.0" promptText="--:--" />
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+
+                                    </children>
+                                </HBox>
+
+                                <VBox spacing="6.0">
+                                    <children>
+                                        <Label styleClass="field-label" text="Descrição" />
+                                        <TextArea fx:id="txtDescricao" prefRowCount="3" promptText="O que foi verificado e o que foi feito no atendimento" wrapText="true" />
+                                    </children>
+                                </VBox>
+
+                            </children>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+
+                <VBox minWidth="280.0" prefWidth="310.0" spacing="12.0" styleClass="rail">
+                    <children>
+                        <Label styleClass="rail-title" text="Histórico do equipamento" />
+                        <Separator />
+                        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+                            <content>
+                                <VBox spacing="8.0">
+                                    <children>
+
+                                        <Label fx:id="lblHistoricoVazio" styleClass="empty-note" wrapText="true"
+                                               text="Busque um número de série para ver os atendimentos anteriores." />
+                                        <VBox fx:id="boxHistorico" spacing="8.0" />
+
+                                    </children>
+                                </VBox>
+
+                            </content>
+                        </ScrollPane>
+                    </children>
+                </VBox>
+
+            </children>
+        </HBox>
+    </center>
+
+    <bottom>
+        <HBox styleClass="actionbar">
+            <children>
+                <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#cancelar" styleClass="btn-quiet" text="Cancelar" />
+                <Button fx:id="btnSalvar" defaultButton="true" mnemonicParsing="false" onAction="#salvarAtendimento" styleClass="btn-accent" text="Salvar atendimento" />
+            </children>
+        </HBox>
+    </bottom>
+
+</BorderPane>
