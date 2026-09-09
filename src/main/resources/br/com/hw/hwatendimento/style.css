@@ -1,40 +1,39 @@
-/* Apenas teste, vai ser modificado*/
 .root {
     -fx-font-family: "Segoe UI", "Inter", "Helvetica Neue", sans-serif;
     -fx-font-size: 13px;
     -fx-background-color: #EEF1F4;
-    -fx-text-fill: #1B2430;
+    -fx-text-fill: #12161A;
 }
 
 
-.topbar {
-    -fx-background-color: #1B2430;
+.barraTopo {
+    -fx-background-color: #12161A;
     -fx-min-height: 56px;
     -fx-padding: 0 22px 0 22px;
     -fx-spacing: 10px;
     -fx-alignment: center-left;
 }
 
-.brand-mark {
-    -fx-background-color: #0F6B62;
+.marcaSelo {
+    -fx-background-color: #0077B6;
     -fx-background-radius: 4px;
     -fx-padding: 5px 8px 5px 8px;
     -fx-text-fill: #FFFFFF;
     -fx-font-size: 12px;
 }
 
-.brand {
+.marca {
     -fx-font-family: "Comfortaa", "Segoe UI", sans-serif;
     -fx-font-size: 17px;
     -fx-text-fill: #FFFFFF;
 }
 
-.topbar-meta {
+.barraTopoInfo {
     -fx-font-size: 12px;
     -fx-text-fill: #93A1AE;
 }
 
-.sheet-scroll {
+.formularioRolagem {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
     -fx-padding: 0;
@@ -42,21 +41,21 @@
     -fx-border-width: 0 1px 0 0;
 }
 
-.sheet-scroll > .viewport {
+.formularioRolagem > .viewport {
     -fx-background-color: #FFFFFF;
 }
 
-.sheet {
+.formulario {
     -fx-background-color: #FFFFFF;
     -fx-padding: 24px 28px 28px 28px;
 }
 
-.rail {
+.painelHistorico {
     -fx-background-color: #F6F8F9;
     -fx-padding: 24px 20px 24px 20px;
 }
 
-.actionbar {
+.barraAcoes {
     -fx-background-color: #FFFFFF;
     -fx-border-color: #D8DEE4;
     -fx-border-width: 1px 0 0 0;
@@ -66,23 +65,23 @@
 }
 
 
-.page-title {
+.tituloPagina {
     -fx-font-family: "Comfortaa", "Segoe UI", sans-serif;
     -fx-font-size: 19px;
-    -fx-text-fill: #1B2430;
+    -fx-text-fill: #12161A;
 }
 
-.page-note {
+.notaPagina {
     -fx-font-size: 12px;
     -fx-text-fill: #6B7A88;
 }
 
-.section-name {
+.tituloSecao {
     -fx-font-size: 13px;
-    -fx-text-fill: #1B2430;
+    -fx-text-fill: #12161A;
 }
 
-.field-label {
+.rotuloCampo {
     -fx-font-size: 12px;
     -fx-text-fill: #6B7A88;
 }
@@ -98,14 +97,14 @@
     -fx-background-radius: 5px;
     -fx-padding: 9px 12px 9px 12px;
     -fx-font-size: 13px;
-    -fx-text-fill: #1B2430;
+    -fx-text-fill: #12161A;
     -fx-prompt-text-fill: #9AA7B4;
 }
 
 .text-field:focused,
 .text-area:focused,
 .combo-box-base:focused {
-    -fx-border-color: #0F6B62;
+    -fx-border-color: #0077B6;
     -fx-effect: dropshadow(gaussian, rgba(15, 107, 98, 0.22), 7, 0, 0, 0);
 }
 
@@ -119,13 +118,20 @@
     -fx-padding: 7px 9px 7px 9px;
 }
 
+.date-picker > .text-field {
+    -fx-padding: 0;
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+    -fx-font-size: 13px;
+}
+
 .combo-box {
     -fx-padding: 0;
 }
 
 .combo-box .list-cell {
     -fx-background-color: transparent;
-    -fx-text-fill: #1B2430;
+    -fx-text-fill: #12161A;
     -fx-padding: 9px 12px 9px 12px;
 }
 
@@ -147,30 +153,30 @@
 }
 
 .combo-box-popup .list-view .list-cell:filled:hover {
-    -fx-background-color: #E7F0EE;
+    -fx-background-color: #E3F1FA;
 }
 
 .combo-box-popup .list-view .list-cell:filled:selected {
-    -fx-background-color: #0F6B62;
+    -fx-background-color: #0077B6;
     -fx-text-fill: #FFFFFF;
 }
 
-.serial-field {
+.campoSerie {
     -fx-font-family: "Consolas", "Menlo", monospace;
     -fx-font-size: 17px;
-    -fx-padding: 12px 14px 12px 14px;
-    -fx-border-color: #1B2430;
+    -fx-padding: 8px 14px 8px 14px;
+    -fx-border-color: #12161A;
     -fx-border-width: 1.5px;
 }
 
-.serial-field:focused {
-    -fx-border-color: #0F6B62;
+.campoSerie:focused {
+    -fx-border-color: #0077B6;
     -fx-effect: dropshadow(gaussian, rgba(15, 107, 98, 0.28), 9, 0, 0, 0);
 }
 
 
-.btn-solid {
-    -fx-background-color: #1B2430;
+.botaoSecundario {
+    -fx-background-color: #12161A;
     -fx-background-radius: 5px;
     -fx-text-fill: #FFFFFF;
     -fx-font-size: 13px;
@@ -178,16 +184,16 @@
     -fx-cursor: hand;
 }
 
-.btn-solid:hover {
-    -fx-background-color: #2A3646;
+.botaoSecundario:hover {
+    -fx-background-color: #262B31;
 }
 
-.btn-solid:pressed {
-    -fx-background-color: #101822;
+.botaoSecundario:pressed {
+    -fx-background-color: #0B0E11;
 }
 
-.btn-accent {
-    -fx-background-color: #0F6B62;
+.botaoPrincipal {
+    -fx-background-color: #0077B6;
     -fx-background-radius: 5px;
     -fx-text-fill: #FFFFFF;
     -fx-font-size: 13px;
@@ -195,27 +201,27 @@
     -fx-cursor: hand;
 }
 
-.btn-accent:hover {
-    -fx-background-color: #0C574F;
+.botaoPrincipal:hover {
+    -fx-background-color: #00639A;
 }
 
-.btn-accent:pressed {
-    -fx-background-color: #09443E;
+.botaoPrincipal:pressed {
+    -fx-background-color: #004F7C;
 }
 
-.btn-quiet {
+.botaoDiscreto {
     -fx-background-color: #FFFFFF;
     -fx-background-radius: 5px;
     -fx-border-color: #C7D0D8;
     -fx-border-radius: 5px;
     -fx-border-width: 1px;
-    -fx-text-fill: #40505F;
+    -fx-text-fill: #3B4149;
     -fx-font-size: 13px;
     -fx-padding: 10px 18px 10px 18px;
     -fx-cursor: hand;
 }
 
-.btn-quiet:hover {
+.botaoDiscreto:hover {
     -fx-background-color: #F2F5F7;
     -fx-border-color: #93A1AE;
 }
@@ -226,7 +232,7 @@
 
 .radio-button {
     -fx-font-size: 13px;
-    -fx-text-fill: #1B2430;
+    -fx-text-fill: #12161A;
     -fx-cursor: hand;
 }
 
@@ -238,53 +244,53 @@
 }
 
 .radio-button:selected .radio {
-    -fx-border-color: #0F6B62;
+    -fx-border-color: #0077B6;
 }
 
 .radio-button:selected .dot {
-    -fx-background-color: #0F6B62;
+    -fx-background-color: #0077B6;
     -fx-background-insets: 0;
 }
 
-.status {
+.mensagem {
     -fx-font-size: 12px;
     -fx-text-fill: #6B7A88;
 }
 
-.status-ok {
-    -fx-text-fill: #0F6B62;
+.mensagemSucesso {
+    -fx-text-fill: #0077B6;
 }
 
-.status-erro {
+.mensagemErro {
     -fx-text-fill: #B02A30;
 }
 
 
-.rail-title {
+.tituloHistorico {
     -fx-font-family: "Comfortaa", "Segoe UI", sans-serif;
     -fx-font-size: 15px;
-    -fx-text-fill: #1B2430;
+    -fx-text-fill: #12161A;
 }
 
-.history-item {
+.historicoItem {
     -fx-background-color: #FFFFFF;
-    -fx-border-color: #0F6B62;
+    -fx-border-color: #0077B6;
     -fx-border-width: 0 0 0 3px;
     -fx-padding: 10px 12px 10px 12px;
     -fx-spacing: 3px;
 }
 
-.history-date {
+.historicoData {
     -fx-font-size: 11px;
     -fx-text-fill: #6B7A88;
 }
 
-.history-text {
+.historicoTexto {
     -fx-font-size: 12px;
-    -fx-text-fill: #1B2430;
+    -fx-text-fill: #12161A;
 }
 
-.empty-note {
+.avisoVazio {
     -fx-font-size: 12px;
     -fx-text-fill: #8A98A5;
 }

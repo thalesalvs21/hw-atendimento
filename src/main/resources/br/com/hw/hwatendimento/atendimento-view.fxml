@@ -1,32 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 
 <!-- Apenas para teste, vai ser modificado-->
-<BorderPane prefHeight="720.0" prefWidth="1040.0" stylesheets="@style.css"
-            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="br.com.hw.hwatendimento.controller.AtendimentoController">
+
+<BorderPane prefHeight="720.0" prefWidth="1040.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.hw.hwatendimento.controller.AtendimentoController">
 
     <top>
-        <HBox styleClass="topbar">
+        <HBox styleClass="barraTopo">
             <children>
-                <Label styleClass="brand-mark" text="HW" />
-                <Label styleClass="brand" text="Atendimento" />
+                <ImageView fitHeight="28.0" preserveRatio="true">
+                    <image>
+                        <Image url="@assets/logo-mobile.png" />
+                    </image>
+                </ImageView>
+                <Label styleClass="marca" text="Atendimento" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Label fx:id="lblDataHora" styleClass="topbar-meta" text="" />
+                <Label fx:id="lblDataHora" styleClass="barraTopoInfo" text="" />
             </children>
         </HBox>
     </top>
@@ -34,30 +27,30 @@
     <center>
         <HBox>
             <children>
-                <ScrollPane fitToWidth="true" styleClass="sheet-scroll" HBox.hgrow="ALWAYS">
+                <ScrollPane fitToWidth="true" styleClass="formularioRolagem" HBox.hgrow="ALWAYS">
                     <content>
-                        <VBox spacing="16.0" styleClass="sheet">
+                        <VBox spacing="16.0" styleClass="formulario">
                             <children>
 
-                                <Label styleClass="page-title" text="Novo atendimento" />
-                                <Label styleClass="page-note" text="Comece pelo número de série do equipamento." />
+                                <Label styleClass="tituloPagina" text="Novo atendimento" />
+                                <Label styleClass="notaPagina" text="Comece pelo número de série do equipamento." />
 
                                 <VBox spacing="6.0">
                                     <children>
-                                        <Label styleClass="field-label" text="Número de série" />
-                                        <HBox spacing="10.0">
+                                        <Label styleClass="rotuloCampo" text="Número de série" />
+                                        <HBox prefWidth="663.0" spacing="10.0">
                                             <children>
-                                                <TextField fx:id="txtNumeroSerie" promptText="XX000000000" styleClass="serial-field" HBox.hgrow="ALWAYS" />
-                                                <Button fx:id="btnBuscar" mnemonicParsing="false" onAction="#buscarEquipamento" styleClass="btn-solid" text="Buscar" />
+                                                <TextField fx:id="txtNumeroSerie" prefWidth="575.0" promptText="XX000000000" styleClass="campoSerie" HBox.hgrow="ALWAYS" />
+                                                <Button fx:id="btnBuscar" mnemonicParsing="false" onAction="#buscarEquipamento" styleClass="botaoSecundario" text="Buscar" />
                                             </children>
                                         </HBox>
-                                        <Label fx:id="lblResultadoBusca" minHeight="16.0" styleClass="status" text="" />
+                                        <Label fx:id="lblResultadoBusca" minHeight="16.0" styleClass="mensagem" text="" />
                                     </children>
                                 </VBox>
 
                                 <HBox alignment="CENTER_LEFT" spacing="12.0">
                                     <children>
-                                        <Label styleClass="section-name" text="Equipamento" />
+                                        <Label styleClass="tituloSecao" text="Equipamento" />
                                         <Separator HBox.hgrow="ALWAYS" />
                                     </children>
                                     <VBox.margin>
@@ -67,14 +60,14 @@
 
                                 <VBox spacing="6.0">
                                     <children>
-                                        <Label styleClass="field-label" text="Modelo" />
+                                        <Label styleClass="rotuloCampo" text="Modelo" />
                                         <ComboBox fx:id="cmbModelo" maxWidth="Infinity" promptText="Selecione uma opção" />
                                     </children>
                                 </VBox>
 
                                 <HBox alignment="CENTER_LEFT" spacing="12.0">
                                     <children>
-                                        <Label styleClass="section-name" text="Cliente" />
+                                        <Label styleClass="tituloSecao" text="Cliente" />
                                         <Separator HBox.hgrow="ALWAYS" />
                                     </children>
                                     <VBox.margin>
@@ -95,7 +88,7 @@
 
                                 <VBox spacing="6.0">
                                     <children>
-                                        <Label styleClass="field-label" text="Empresa" />
+                                        <Label styleClass="rotuloCampo" text="Empresa" />
                                         <TextField fx:id="txtEmpresa" maxWidth="Infinity" promptText="Somente para pessoa jurídica" />
                                     </children>
                                 </VBox>
@@ -104,13 +97,13 @@
                                     <children>
                                         <VBox spacing="6.0" HBox.hgrow="ALWAYS">
                                             <children>
-                                                <Label styleClass="field-label" text="Nome" />
+                                                <Label styleClass="rotuloCampo" text="Nome" />
                                                 <TextField fx:id="txtNome" maxWidth="Infinity" promptText="Insira o nome do cliente" />
                                             </children>
                                         </VBox>
                                         <VBox spacing="6.0" HBox.hgrow="ALWAYS">
                                             <children>
-                                                <Label styleClass="field-label" text="Telefone" />
+                                                <Label styleClass="rotuloCampo" text="Telefone" />
                                                 <TextField fx:id="txtTelefone" maxWidth="Infinity" promptText="(00) 00000-0000" />
                                             </children>
                                         </VBox>
@@ -119,7 +112,7 @@
 
                                 <HBox alignment="CENTER_LEFT" spacing="12.0">
                                     <children>
-                                        <Label styleClass="section-name" text="Atendimento" />
+                                        <Label styleClass="tituloSecao" text="Atendimento" />
                                         <Separator HBox.hgrow="ALWAYS" />
                                     </children>
                                     <VBox.margin>
@@ -132,11 +125,11 @@
 
                                         <VBox spacing="6.0" HBox.hgrow="ALWAYS">
                                             <children>
-                                                <Label styleClass="field-label" text="Início" />
+                                                <Label styleClass="rotuloCampo" text="Início" />
                                                 <HBox spacing="8.0">
                                                     <children>
-                                                        <DatePicker fx:id="dtInicio" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
-                                                        <TextField fx:id="txtHoraInicio" maxWidth="72.0" minWidth="72.0" prefWidth="72.0" promptText="08:15" />
+                                                        <DatePicker fx:id="dtInicio" editable="false" maxWidth="Infinity" promptText="Selecione uma data" HBox.hgrow="ALWAYS" />
+                                                        <TextField fx:id="txtHoraInicio" maxWidth="72.0" minWidth="72.0" prefWidth="72.0" promptText="--:--" />
                                                     </children>
                                                 </HBox>
                                             </children>
@@ -144,10 +137,10 @@
 
                                         <VBox spacing="6.0" HBox.hgrow="ALWAYS">
                                             <children>
-                                                <Label styleClass="field-label" text="Término" />
+                                                <Label styleClass="rotuloCampo" text="Término" />
                                                 <HBox spacing="8.0">
                                                     <children>
-                                                        <DatePicker fx:id="dtFim" maxWidth="Infinity" promptText="em aberto" HBox.hgrow="ALWAYS" />
+                                                        <DatePicker fx:id="dtFim" editable="false" maxWidth="Infinity" promptText="em aberto" HBox.hgrow="ALWAYS" />
                                                         <TextField fx:id="txtHoraFim" maxWidth="72.0" minWidth="72.0" prefWidth="72.0" promptText="--:--" />
                                                     </children>
                                                 </HBox>
@@ -159,7 +152,7 @@
 
                                 <VBox spacing="6.0">
                                     <children>
-                                        <Label styleClass="field-label" text="Descrição" />
+                                        <Label styleClass="rotuloCampo" text="Descrição" />
                                         <TextArea fx:id="txtDescricao" prefRowCount="3" promptText="O que foi verificado e o que foi feito no atendimento" wrapText="true" />
                                     </children>
                                 </VBox>
@@ -169,17 +162,16 @@
                     </content>
                 </ScrollPane>
 
-                <VBox minWidth="280.0" prefWidth="310.0" spacing="12.0" styleClass="rail">
+                <VBox minWidth="280.0" prefWidth="310.0" spacing="12.0" styleClass="painelHistorico">
                     <children>
-                        <Label styleClass="rail-title" text="Histórico do equipamento" />
+                        <Label styleClass="tituloHistorico" text="Histórico do equipamento" />
                         <Separator />
                         <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
                             <content>
                                 <VBox spacing="8.0">
                                     <children>
 
-                                        <Label fx:id="lblHistoricoVazio" styleClass="empty-note" wrapText="true"
-                                               text="Busque um número de série para ver os atendimentos anteriores." />
+                                        <Label fx:id="lblHistoricoVazio" styleClass="avisoVazio" text="Busque um número de série para ver os atendimentos anteriores." wrapText="true" />
                                         <VBox fx:id="boxHistorico" spacing="8.0" />
 
                                     </children>
@@ -195,10 +187,10 @@
     </center>
 
     <bottom>
-        <HBox styleClass="actionbar">
+        <HBox styleClass="barraAcoes">
             <children>
-                <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#cancelar" styleClass="btn-quiet" text="Cancelar" />
-                <Button fx:id="btnSalvar" defaultButton="true" mnemonicParsing="false" onAction="#salvarAtendimento" styleClass="btn-accent" text="Salvar atendimento" />
+                <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#cancelar" styleClass="botaoDiscreto" text="Cancelar" />
+                <Button fx:id="btnSalvar" defaultButton="true" mnemonicParsing="false" onAction="#salvarAtendimento" styleClass="botaoPrincipal" text="Salvar atendimento" />
             </children>
         </HBox>
     </bottom>
