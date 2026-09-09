@@ -59,7 +59,7 @@ public class AtendimentoRepository {
 
 
     public static void main(String[] args){
-        //Busca pelo numero de serie e pega o id do equipamento
+        // Busca pelo numero de serie e pega o id do equipamento
         EquipamentoRepository eRepo = new EquipamentoRepository();
         Equipamento equipamento = eRepo.buscaNumeroSerie(Conexao.conectar(), "TE090909999");
         if (equipamento != null) {
@@ -75,23 +75,32 @@ public class AtendimentoRepository {
         /* Testa insert atendimento
         //Cria o cliente
         Cliente cliente = new Cliente();
-        cliente.setNome("Teste Junior");
+        cliente.setNome("Teste3");
         cliente.setTipo("J");
-        cliente.setNomeEmpresa("Teste Corporation");
-        cliente.setTelefone("31999995545");
+        cliente.setNomeEmpresa("Teste Empresa");
+        cliente.setTelefone("31999999949");
 
         ClienteRepository cRepo = new ClienteRepository();
         cRepo.inserirCliente(Conexao.conectar(), cliente);
 
-        //Cria o equipamento
-        Equipamento equipamento = new Equipamento();
-        equipamento.setModelo("Ergo13");
-        equipamento.setNumeroSerie("TE090909999");
-        // liga o equipamento ao cliente criado acima
-        equipamento.setCliente(cliente);
+        EquipamentoRepository eRepo = new EquipamentoRepository();
+        Equipamento equipamento = eRepo.buscaNumeroSerie(Conexao.conectar(), "TE090909999");
 
-        EquipamentoRepository Erepo = new EquipamentoRepository();
-        Erepo.inserirEquipamento(Conexao.conectar(), equipamento);
+        if (equipamento != null) {
+            Atendimento atendimento = new Atendimento();
+            atendimento.setEquipamento(equipamento);
+            atendimento.setCliente(equipamento.getCliente());
+            atendimento.setDataHoraInicio(LocalDateTime.now());
+            atendimento.setDataHoraFim(null);
+            atendimento.setDescricao("Segundo atendimento de teste");
+
+            AtendimentoRepository repo = new AtendimentoRepository();
+            repo.inserirAtendimento(Conexao.conectar(), atendimento);
+
+            System.out.println("Atendimento criado: " + atendimento.getId());
+        } else {
+            System.out.println("Equipamento não encontrado");
+        }
 
         //Cria o atendimento
         Atendimento atendimento = new Atendimento();
@@ -99,7 +108,7 @@ public class AtendimentoRepository {
         atendimento.setEquipamento(equipamento);
         atendimento.setDataHoraInicio(LocalDateTime.now());
         atendimento.setDataHoraFim(null);
-        atendimento.setDescricao("Instalando o sistema");
+        atendimento.setDescricao("Rodando checatab");
 
         AtendimentoRepository repo = new AtendimentoRepository();
         repo.inserirAtendimento(Conexao.conectar(), atendimento);
