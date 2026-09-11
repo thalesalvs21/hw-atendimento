@@ -99,19 +99,22 @@ public class AtendimentoController {
                 equipamentoAtual = eRepo.buscaNumeroSerie(conexao, numeroSerie);
 
                 if (equipamentoAtual != null) {
-                    lblResultadoBusca.setText("✔ Equipamento encontrado");
-                    lblResultadoBusca.getStyleClass().add("mensagemSucesso");
-                    cmbModelo.setValue(equipamentoAtual.getModelo());
                     Cliente cliente = equipamentoAtual.getCliente();
+                    
+                    lblResultadoBusca.getStyleClass().add("mensagemSucesso");
+
+                    lblResultadoBusca.setText("✔ Equipamento encontrado");
+                    cmbModelo.setValue(equipamentoAtual.getModelo());
                     txtNome.setText(cliente.getNome());
                     txtTelefone.setText(cliente.getTelefone());
-                        if ("J".equals(cliente.getTipo())){
-                            rbJuridica.setSelected(true);
-                            txtEmpresa.setText(cliente.getNomeEmpresa());
-                        } else {
-                            rbFisica.setSelected(true);
-                            txtEmpresa.setText(null);
-                        }
+
+                    if ("J".equals(cliente.getTipo())){
+                        rbJuridica.setSelected(true);
+                        txtEmpresa.setText(cliente.getNomeEmpresa());
+                    } else {
+                        rbFisica.setSelected(true);
+                        txtEmpresa.setText(null);
+                    }
                 } else {
                     lblResultadoBusca.setText("✖ Equipamento não encontrado");
                     lblResultadoBusca.getStyleClass().add("mensagemErro");
@@ -122,11 +125,8 @@ public class AtendimentoController {
                 }
     }
 
-    @FXML
-    private void salvarAtendimento() { }
 
-    @FXML
-    private void cancelar() {
+    private void limpaTela(){
         txtNumeroSerie.clear();
         txtEmpresa.clear();
         lblResultadoBusca.setText("");
@@ -140,5 +140,12 @@ public class AtendimentoController {
         dtFim.setValue(null);
         rbFisica.setSelected(true);
         equipamentoAtual = null;
+    }
+    @FXML
+    private void salvarAtendimento() { }
+
+    @FXML
+    private void cancelar() {
+        limpaTela();
     }
 }
