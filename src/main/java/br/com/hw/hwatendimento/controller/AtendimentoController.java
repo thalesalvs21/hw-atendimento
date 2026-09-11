@@ -6,15 +6,19 @@ import javafx.scene.control.*;
 import br.com.hw.hwatendimento.repositories.*;
 import br.com.hw.hwatendimento.model.*;
 import javafx.fxml.FXML;
-
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class AtendimentoController {
-    @FXML private TextField txtNumeroSerie, txtEmpresa;
+    @FXML private TextField txtNumeroSerie, txtEmpresa, txtNome, txtTelefone, txtHoraFim, txtHoraInicio;
+    @FXML private TextArea txtDescricao;
     @FXML private Label lblResultadoBusca;
     @FXML private ComboBox<String> cmbModelo;
     @FXML private ToggleGroup tipoCliente;
-    @FXML private RadioButton rbJuridica;
+    @FXML private RadioButton rbJuridica, rbFisica;
+    @FXML private DatePicker dtInicio, dtFim;
+    private Equipamento equipamentoAtual;
 
     @FXML
     private void initialize(){
@@ -89,17 +93,33 @@ public class AtendimentoController {
             retornaInvalido();
             return;
         }
-        // Depois de passar por todos os if, ele cai aqui
-        EquipamentoRepository eRepo = new EquipamentoRepository();
-        Equipamento equipamento = eRepo.buscaNumeroSerie(Conexao.conectar(), numeroSerie);
 
-        if (equipamento != null) {
-            lblResultadoBusca.setText("✔ Equipamento encontrado");
-            lblResultadoBusca.getStyleClass().add("mensagemSucesso");
-        } else {
-            lblResultadoBusca.setText("✖ Equipamento não encontrado");
-            lblResultadoBusca.getStyleClass().add("mensagemErro");
-        }
+            try (Connection conexao = Conexao.conectar()) {
+                EquipamentoRepository eRepo = new EquipamentoRepository();
+                equipamentoAtual = eRepo.buscaNumeroSerie(conexao, numeroSerie);
+
+                if (equipamentoAtual != null) {
+                    lblResultadoBusca.setText("✔ Equipamento encontrado");
+                    lblResultadoBusca.getStyleClass().add("mensagemSucesso");
+                    cmbModelo.setValue(equipamentoAtual.getModelo());
+                    Cliente cliente = equipamentoAtual.getCliente();
+                    txtNome.setText(cliente.getNome());
+                    txtTelefone.setText(cliente.getTelefone());
+                        if ("J".equals(cliente.getTipo())){
+                            rbJuridica.setSelected(true);
+                            txtEmpresa.setText(cliente.getNomeEmpresa());
+                        } else {
+                            rbFisica.setSelected(true);
+                            txtEmpresa.setText(null);
+                        }
+                } else {
+                    lblResultadoBusca.setText("✖ Equipamento não encontrado");
+                    lblResultadoBusca.getStyleClass().add("mensagemErro");
+                    }
+            } catch (SQLException e) {
+                lblResultadoBusca.setText("✖ Erro ao consultar o banco");
+                lblResultadoBusca.getStyleClass().add("mensagemErro");
+                }
     }
 
     @FXML
@@ -111,6 +131,14 @@ public class AtendimentoController {
         txtEmpresa.clear();
         lblResultadoBusca.setText("");
         cmbModelo.getSelectionModel().clearSelection();
-
+        txtNome.clear();
+        txtTelefone.clear();
+        txtDescricao.clear();
+        txtHoraInicio.clear();
+        txtHoraFim.clear();
+        dtInicio.setValue(null);
+        dtFim.setValue(null);
+        rbFisica.setSelected(true);
+        equipamentoAtual = null;
     }
 }
