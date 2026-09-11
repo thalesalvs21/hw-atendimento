@@ -1,4 +1,5 @@
 package br.com.hw.hwatendimento.controller;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
@@ -37,13 +38,21 @@ public class AtendimentoController {
         txtEmpresa.setDisable(!rbJuridica.isSelected());
         //Depois tem essa verificaçao para ver se a opção PJ ta selecionada, se sim, ela habilita a caixa
         tipoCliente.selectedToggleProperty().addListener((obs, anterior, novo) -> {
-            txtEmpresa.setDisable(!rbJuridica.isSelected());
+            boolean juridica = rbJuridica.isSelected();
+
+            txtEmpresa.setDisable(!juridica);
+
+            if(!juridica){
+                txtEmpresa.clear();
+            }
         });
     }
+
     private void retornaInvalido(){
         lblResultadoBusca.setText("✖ Número de serie invalido!");
         lblResultadoBusca.getStyleClass().add("mensagemErro");
     }
+
     @FXML
     private void buscarEquipamento() {
         lblResultadoBusca.getStyleClass().removeAll("mensagemSucesso", "mensagemErro");
@@ -80,7 +89,6 @@ public class AtendimentoController {
             retornaInvalido();
             return;
         }
-
         // Depois de passar por todos os if, ele cai aqui
         EquipamentoRepository eRepo = new EquipamentoRepository();
         Equipamento equipamento = eRepo.buscaNumeroSerie(Conexao.conectar(), numeroSerie);
@@ -93,9 +101,16 @@ public class AtendimentoController {
             lblResultadoBusca.getStyleClass().add("mensagemErro");
         }
     }
+
     @FXML
     private void salvarAtendimento() { }
 
     @FXML
-    private void cancelar() { }
+    private void cancelar() {
+        txtNumeroSerie.clear();
+        txtEmpresa.clear();
+        lblResultadoBusca.setText("");
+        cmbModelo.getSelectionModel().clearSelection();
+
+    }
 }
