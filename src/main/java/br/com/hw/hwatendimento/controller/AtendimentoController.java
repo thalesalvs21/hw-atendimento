@@ -49,38 +49,49 @@ public class AtendimentoController {
         lblResultadoBusca.getStyleClass().removeAll("mensagemSucesso", "mensagemErro");
         String numeroSerie = txtNumeroSerie.getText().toUpperCase();
 
-            //Verificaçao se o numero de serie é valido
-            if(numeroSerie.length() == 11){
-                if (numeroSerie.substring(2).matches("\\d{9}")){
-                    String modelo = numeroSerie.substring(0, 2);
-                    String versao = numeroSerie.substring(2, 4);
-                    int ano = Integer.parseInt(numeroSerie.substring(4, 6));
-                    int anoAtual = LocalDate.now().getYear() % 100;
-                    int mes = Integer.parseInt(numeroSerie.substring(6,8));
-                    int numeroProducao = Integer.parseInt(numeroSerie.substring(8,11));
+        if (!numeroSerie.matches("[A-Z]{2}\\d{9}")) {
+            retornaInvalido();
+            return;
+        }
+        String modelo = numeroSerie.substring(0, 2);
+        String versao = numeroSerie.substring(2, 4);
+        int ano = Integer.parseInt(numeroSerie.substring(4, 6));
+        int anoAtual = LocalDate.now().getYear() % 100;
+        int mes = Integer.parseInt(numeroSerie.substring(6, 8));
+        int numeroProducao = Integer.parseInt(numeroSerie.substring(8, 11));
 
-                    if(modelo.equals("TC") || modelo.equals("TE") || modelo.equals("EC") || modelo.equals("TP")) {
-                        if(versao.equals("10") || (versao.equals("11") && modelo.equals("EC"))){
-                            if(ano >= 9 && ano <= anoAtual){
-                                if(mes >= 1 && mes <= 12){
-                                    if (numeroProducao >= 1 && numeroProducao <= 999){
-                                        //Verificaçao se o numero de serie existe no banco (Depois de ver se é valido)
-                                        EquipamentoRepository eRepo = new EquipamentoRepository();
-                                        Equipamento equipamento = eRepo.buscaNumeroSerie(Conexao.conectar(), numeroSerie);
-                                        if (equipamento != null){
-                                            lblResultadoBusca.setText("✔ Equipamento encontrado");
-                                            lblResultadoBusca.getStyleClass().add("mensagemSucesso");
-                                        } else{
-                                            lblResultadoBusca.setText("✖ Equipamento não encontrado");
-                                            lblResultadoBusca.getStyleClass().add("mensagemErro");
-                                        }
-                                    } else{retornaInvalido();}
-                                } else{retornaInvalido();}
-                            } else{retornaInvalido();}
-                        } else{retornaInvalido();}
-                    } else{retornaInvalido();}
-                } else{retornaInvalido();}
-            } else{retornaInvalido();}
+        if (!modelo.equals("TC") && !modelo.equals("TE") && !modelo.equals("EC") && !modelo.equals("TP")) {
+            retornaInvalido();
+            return;
+        }
+        if (!versao.equals("10") && !(versao.equals("11") && modelo.equals("EC"))) {
+            retornaInvalido();
+            return;
+        }
+        if (ano < 9 || ano > anoAtual) {
+            retornaInvalido();
+            return;
+        }
+        if (mes < 1 || mes > 12) {
+            retornaInvalido();
+            return;
+        }
+        if (numeroProducao < 1 || numeroProducao > 999) {
+            retornaInvalido();
+            return;
+        }
+
+        // Depois de passar por todos os if, ele cai aqui
+        EquipamentoRepository eRepo = new EquipamentoRepository();
+        Equipamento equipamento = eRepo.buscaNumeroSerie(Conexao.conectar(), numeroSerie);
+
+        if (equipamento != null) {
+            lblResultadoBusca.setText("✔ Equipamento encontrado");
+            lblResultadoBusca.getStyleClass().add("mensagemSucesso");
+        } else {
+            lblResultadoBusca.setText("✖ Equipamento não encontrado");
+            lblResultadoBusca.getStyleClass().add("mensagemErro");
+        }
     }
     @FXML
     private void salvarAtendimento() { }
