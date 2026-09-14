@@ -13,6 +13,7 @@ public class HWApplication extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HWApplication.class.getResource("atendimento-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
+        stage.setTitle("HW Atendimento");
         stage.getIcons().addAll(
                 new Image(getClass().getResourceAsStream("/br/com/hw/hwatendimento/assets/icone-16.png")),
                 new Image(getClass().getResourceAsStream("/br/com/hw/hwatendimento/assets/icone-32.png")),

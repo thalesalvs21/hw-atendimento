@@ -71,6 +71,7 @@ public class AtendimentoController {
             retornaInvalido();
             return;
         }
+
         String modelo = numeroSerie.substring(0, 2);
         String versao = numeroSerie.substring(2, 4);
         int ano = Integer.parseInt(numeroSerie.substring(4, 6));
@@ -78,6 +79,7 @@ public class AtendimentoController {
         int mes = Integer.parseInt(numeroSerie.substring(6, 8));
         int numeroProducao = Integer.parseInt(numeroSerie.substring(8, 11));
 
+        //Valida se o numero de serie é valido
         if (!modelo.equals("TC") && !modelo.equals("TE") && !modelo.equals("EC") && !modelo.equals("TP")) {
             retornaInvalido();
             return;
@@ -98,7 +100,8 @@ public class AtendimentoController {
             retornaInvalido();
             return;
         }
-
+            //Se o numero for valido, puxa os dados do cliente e o historico de atendimento e preenche na tela
+            //Se não, devolve uma mensagem de equipamento não encontrado
             try (Connection conexao = Conexao.conectar()) {
                 EquipamentoRepository eRepo = new EquipamentoRepository();
                 equipamentoAtual = eRepo.buscaNumeroSerie(conexao, numeroSerie);
@@ -125,7 +128,9 @@ public class AtendimentoController {
                     boxHistorico.getChildren().clear();
                     lblHistoricoVazio.setVisible(false);
                     lblHistoricoVazio.setManaged(false);
+
                     AtendimentoRepository aRepo = new AtendimentoRepository();
+
                     List<Atendimento> historico = aRepo.buscaPorEquipamento(conexao, equipamentoAtual.getId());
                     for (Atendimento atendimento : historico){
                         Label lblData = new Label(atendimento.getDataHoraInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
@@ -167,6 +172,9 @@ public class AtendimentoController {
         dtFim.setValue(null);
         rbFisica.setSelected(true);
         equipamentoAtual = null;
+        boxHistorico.getChildren().clear();
+        lblHistoricoVazio.setVisible(true);
+        lblHistoricoVazio.setManaged(true);
     }
     @FXML
     private void salvarAtendimento() { }
