@@ -6,18 +6,22 @@ import javafx.scene.control.*;
 import br.com.hw.hwatendimento.repositories.*;
 import br.com.hw.hwatendimento.model.*;
 import javafx.fxml.FXML;
+import javafx.scene.layout.VBox;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class AtendimentoController {
     @FXML private TextField txtNumeroSerie, txtEmpresa, txtNome, txtTelefone, txtHoraFim, txtHoraInicio;
     @FXML private TextArea txtDescricao;
-    @FXML private Label lblResultadoBusca;
+    @FXML private Label lblResultadoBusca, lblHistoricoVazio;
     @FXML private ComboBox<String> cmbModelo;
     @FXML private ToggleGroup tipoCliente;
     @FXML private RadioButton rbJuridica, rbFisica;
     @FXML private DatePicker dtInicio, dtFim;
+    @FXML private VBox boxHistorico;
     private Equipamento equipamentoAtual;
 
     @FXML
@@ -60,7 +64,8 @@ public class AtendimentoController {
     @FXML
     private void buscarEquipamento() {
         lblResultadoBusca.getStyleClass().removeAll("mensagemSucesso", "mensagemErro");
-        String numeroSerie = txtNumeroSerie.getText().toUpperCase();
+        txtNumeroSerie.setText(txtNumeroSerie.getText().toUpperCase());
+        String numeroSerie = txtNumeroSerie.getText();
 
         if (!numeroSerie.matches("[A-Z]{2}\\d{9}")) {
             retornaInvalido();
@@ -100,7 +105,7 @@ public class AtendimentoController {
 
                 if (equipamentoAtual != null) {
                     Cliente cliente = equipamentoAtual.getCliente();
-                    
+
                     lblResultadoBusca.getStyleClass().add("mensagemSucesso");
 
                     lblResultadoBusca.setText("✔ Equipamento encontrado");
@@ -115,6 +120,28 @@ public class AtendimentoController {
                         rbFisica.setSelected(true);
                         txtEmpresa.setText(null);
                     }
+
+                    // Exibir historico de atendimentos
+                    boxHistorico.getChildren().clear();
+                    lblHistoricoVazio.setVisible(false);
+                    lblHistoricoVazio.setManaged(false);
+                    AtendimentoRepository aRepo = new AtendimentoRepository();
+                    List<Atendimento> historico = aRepo.buscaPorEquipamento(conexao, equipamentoAtual.getId());
+                    for (Atendimento atendimento : historico){
+                        Label lblData = new Label(atendimento.getDataHoraInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+                        Label lblDescricao = new Label(atendimento.getDescricao());
+
+                        VBox bloco = new VBox(lblData, lblDescricao);
+                        boxHistorico.getChildren().add(bloco);
+
+                        lblData.getStyleClass().add("historicoData");
+                        lblDescricao.getStyleClass().add("historicoTexto");
+                        lblDescricao.setWrapText(true);
+                        lblDescricao.setMaxWidth(Double.MAX_VALUE);
+
+                        bloco.getStyleClass().add("historicoItem");
+                        }
+
                 } else {
                     lblResultadoBusca.setText("✖ Equipamento não encontrado");
                     lblResultadoBusca.getStyleClass().add("mensagemErro");

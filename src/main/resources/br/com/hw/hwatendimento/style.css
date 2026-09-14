@@ -281,12 +281,12 @@
 }
 
 .historicoData {
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
     -fx-text-fill: #6B7A88;
 }
 
 .historicoTexto {
-    -fx-font-size: 12px;
+    -fx-font-size: 13px;
     -fx-text-fill: #12161A;
 }
 
