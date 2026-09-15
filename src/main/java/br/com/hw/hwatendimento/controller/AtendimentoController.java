@@ -24,6 +24,36 @@ public class AtendimentoController {
     @FXML private VBox boxHistorico;
     private Equipamento equipamentoAtual;
 
+    //Criação do metodo para mascara da hora
+    private void mascaraHora(TextField campo){
+        campo.setTextFormatter(new TextFormatter<String>(mudanca -> {
+            if (mudanca.isDeleted()) {
+                return mudanca;
+            }
+
+            String texto = mudanca.getControlNewText();
+            String digitos = texto.replaceAll("\\D", "");
+            String formatado;
+
+
+            if (digitos.length() > 4) {
+                digitos = digitos.substring(0, 4);
+            }
+
+            if (digitos.length() <= 2) {
+                formatado = digitos;
+            } else {
+                formatado = digitos.substring(0, 2) + ":" + digitos.substring(2);
+            }
+            mudanca.setRange(0, mudanca.getControlText().length());
+            mudanca.setText(formatado);
+            mudanca.setCaretPosition(formatado.length());
+            mudanca.setAnchor(formatado.length());
+
+            return mudanca;
+        }));
+    }
+
     @FXML
     private void initialize(){
         //Limita a caixa de texto em 11 caracteres
@@ -32,6 +62,41 @@ public class AtendimentoController {
                 return tamanho;
             } return null;
         }));
+
+        //Formata o telefone com a mascara (--) 11111-1111
+        txtTelefone.setTextFormatter(new TextFormatter<String>(mudanca -> {
+            if (mudanca.isDeleted()) {
+                return mudanca;
+            }
+
+            String texto = mudanca.getControlNewText();
+            String digitos = texto.replaceAll("\\D", "");
+            String formatado;
+
+
+            if (digitos.length() > 11) {
+                digitos = digitos.substring(0, 11);
+            }
+
+            if (digitos.length() <= 2) {
+                formatado = digitos;
+            } else if (digitos.length() <= 7) {
+                formatado = "(" + digitos.substring(0, 2) + ") " + digitos.substring(2);
+            } else {
+                formatado = "(" + digitos.substring(0, 2) + ") "
+                + digitos.substring(2, 7) + "-"
+                + digitos.substring(7);
+            }
+            mudanca.setRange(0, mudanca.getControlText().length());
+            mudanca.setText(formatado);
+            mudanca.setCaretPosition(formatado.length());
+            mudanca.setAnchor(formatado.length());
+            return mudanca;
+        }));
+        //Chamando metodo mascara hora
+        mascaraHora(txtHoraInicio);
+        mascaraHora(txtHoraFim);
+
         //Seta as opções da comboBox
         ObservableList<String> opcoes = FXCollections.observableArrayList(
                 "ECGV6",
