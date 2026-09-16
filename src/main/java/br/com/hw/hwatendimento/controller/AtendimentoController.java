@@ -1,7 +1,6 @@
 package br.com.hw.hwatendimento.controller;
 import br.com.hw.hwatendimento.util.Mascaras;
 import br.com.hw.hwatendimento.util.ValidadorSerie;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
@@ -12,6 +11,8 @@ import javafx.scene.layout.VBox;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -51,7 +52,7 @@ public class AtendimentoController {
                 "ErgoMET13",
                 "ErgoCP"
         );
-            cmbModelo.setItems(opcoes);
+        cmbModelo.setItems(opcoes);
 
         // Caixa pro nome da empresa começa desativada
         //Depois tem essa verificaçao para ver se a opção PJ ta selecionada, se sim, ela habilita a caixa
@@ -112,7 +113,7 @@ public class AtendimentoController {
                     AtendimentoRepository aRepo = new AtendimentoRepository();
 
                     List<Atendimento> historico = aRepo.buscaPorEquipamento(conexao, equipamentoAtual.getId());
-                    for (Atendimento atendimento : historico){
+                    for (Atendimento atendimento : historico) {
                         Label lblData = new Label(atendimento.getDataHoraInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
                         Label lblDescricao = new Label(atendimento.getDescricao());
 
@@ -125,14 +126,15 @@ public class AtendimentoController {
                         lblDescricao.setMaxWidth(Double.MAX_VALUE);
 
                         bloco.getStyleClass().add("historicoItem");
-                        }
+                    }
 
                 } else {
                     mensagem("✖ Equipamento não encontrado", "mensagemErro");
                     }
-            } catch (SQLException e) {
+            }
+            catch (SQLException e) {
                 mensagem("✖ Erro ao consultar o banco", "mensagemErro");
-                }
+            }
     }
 
     private void limpaResultado(){
@@ -158,7 +160,11 @@ public class AtendimentoController {
         txtNumeroSerie.clear();
     }
     @FXML
-    private void salvarAtendimento() { }
+    private void salvarAtendimento() {
+        LocalDate data = dtInicio.getValue();
+        LocalTime hora = LocalTime.parse(txtHoraInicio.getText());
+        LocalDateTime inicio = data.atTime(hora);
+    }
 
     @FXML
     private void cancelar() {
