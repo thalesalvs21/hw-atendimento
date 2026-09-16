@@ -1,4 +1,6 @@
 package br.com.hw.hwatendimento.controller;
+import br.com.hw.hwatendimento.util.Mascaras;
+import br.com.hw.hwatendimento.util.ValidadorSerie;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,78 +26,22 @@ public class AtendimentoController {
     @FXML private VBox boxHistorico;
     private Equipamento equipamentoAtual;
 
-    //Criação do metodo para mascara da hora
-    private void mascaraHora(TextField campo){
-        campo.setTextFormatter(new TextFormatter<String>(mudanca -> {
-            if (mudanca.isDeleted()) {
-                return mudanca;
-            }
-
-            String texto = mudanca.getControlNewText();
-            String digitos = texto.replaceAll("\\D", "");
-            String formatado;
-
-
-            if (digitos.length() > 4) {
-                digitos = digitos.substring(0, 4);
-            }
-
-            if (digitos.length() <= 2) {
-                formatado = digitos;
-            } else {
-                formatado = digitos.substring(0, 2) + ":" + digitos.substring(2);
-            }
-            mudanca.setRange(0, mudanca.getControlText().length());
-            mudanca.setText(formatado);
-            mudanca.setCaretPosition(formatado.length());
-            mudanca.setAnchor(formatado.length());
-
-            return mudanca;
-        }));
+    private void retornaInvalido(){
+        lblResultadoBusca.setText("✖ Número de serie invalido!");
+        lblResultadoBusca.getStyleClass().add("mensagemErro");
+    }
+    private void mensagem(String mensagem, String classe){
+        lblResultadoBusca.getStyleClass().removeAll("mensagemSucesso", "mensagemErro");
+        lblResultadoBusca.setText(mensagem);
+        lblResultadoBusca.getStyleClass().add(classe);
     }
 
     @FXML
     private void initialize(){
-        //Limita a caixa de texto em 11 caracteres
-        txtNumeroSerie.setTextFormatter(new TextFormatter<String>(tamanho -> {
-            if (tamanho.getControlNewText().length() <= 11) {
-                return tamanho;
-            } return null;
-        }));
-
-        //Formata o telefone com a mascara (--) 11111-1111
-        txtTelefone.setTextFormatter(new TextFormatter<String>(mudanca -> {
-            if (mudanca.isDeleted()) {
-                return mudanca;
-            }
-
-            String texto = mudanca.getControlNewText();
-            String digitos = texto.replaceAll("\\D", "");
-            String formatado;
-
-
-            if (digitos.length() > 11) {
-                digitos = digitos.substring(0, 11);
-            }
-
-            if (digitos.length() <= 2) {
-                formatado = digitos;
-            } else if (digitos.length() <= 7) {
-                formatado = "(" + digitos.substring(0, 2) + ") " + digitos.substring(2);
-            } else {
-                formatado = "(" + digitos.substring(0, 2) + ") "
-                + digitos.substring(2, 7) + "-"
-                + digitos.substring(7);
-            }
-            mudanca.setRange(0, mudanca.getControlText().length());
-            mudanca.setText(formatado);
-            mudanca.setCaretPosition(formatado.length());
-            mudanca.setAnchor(formatado.length());
-            return mudanca;
-        }));
-        //Chamando metodo mascara hora
-        mascaraHora(txtHoraInicio);
-        mascaraHora(txtHoraFim);
+        Mascaras.serie(txtNumeroSerie);
+        Mascaras.telefone(txtTelefone);
+        Mascaras.hora(txtHoraInicio);
+        Mascaras.hora(txtHoraFim);
 
         //Seta as opções da comboBox
         ObservableList<String> opcoes = FXCollections.observableArrayList(
@@ -108,8 +54,9 @@ public class AtendimentoController {
             cmbModelo.setItems(opcoes);
 
         // Caixa pro nome da empresa começa desativada
-        txtEmpresa.setDisable(!rbJuridica.isSelected());
         //Depois tem essa verificaçao para ver se a opção PJ ta selecionada, se sim, ela habilita a caixa
+        txtEmpresa.setDisable(!rbJuridica.isSelected());
+
         tipoCliente.selectedToggleProperty().addListener((obs, anterior, novo) -> {
             boolean juridica = rbJuridica.isSelected();
 
@@ -121,50 +68,19 @@ public class AtendimentoController {
         });
     }
 
-    private void retornaInvalido(){
-        lblResultadoBusca.setText("✖ Número de serie invalido!");
-        lblResultadoBusca.getStyleClass().add("mensagemErro");
-    }
-
     @FXML
     private void buscarEquipamento() {
-        lblResultadoBusca.getStyleClass().removeAll("mensagemSucesso", "mensagemErro");
+        limpaResultado();
+
         txtNumeroSerie.setText(txtNumeroSerie.getText().toUpperCase());
         String numeroSerie = txtNumeroSerie.getText();
 
-        if (!numeroSerie.matches("[A-Z]{2}\\d{9}")) {
-            retornaInvalido();
-            return;
-        }
+            // Chama o validador de numero de serie
+            if (!ValidadorSerie.validar(numeroSerie)){
+                retornaInvalido();
+                return;
+            }
 
-        String modelo = numeroSerie.substring(0, 2);
-        String versao = numeroSerie.substring(2, 4);
-        int ano = Integer.parseInt(numeroSerie.substring(4, 6));
-        int anoAtual = LocalDate.now().getYear() % 100;
-        int mes = Integer.parseInt(numeroSerie.substring(6, 8));
-        int numeroProducao = Integer.parseInt(numeroSerie.substring(8, 11));
-
-        //Valida se o numero de serie é valido
-        if (!modelo.equals("TC") && !modelo.equals("TE") && !modelo.equals("EC") && !modelo.equals("TP")) {
-            retornaInvalido();
-            return;
-        }
-        if (!versao.equals("10") && !(versao.equals("11") && modelo.equals("EC"))) {
-            retornaInvalido();
-            return;
-        }
-        if (ano < 9 || ano > anoAtual) {
-            retornaInvalido();
-            return;
-        }
-        if (mes < 1 || mes > 12) {
-            retornaInvalido();
-            return;
-        }
-        if (numeroProducao < 1 || numeroProducao > 999) {
-            retornaInvalido();
-            return;
-        }
             //Se o numero for valido, puxa os dados do cliente e o historico de atendimento e preenche na tela
             //Se não, devolve uma mensagem de equipamento não encontrado
             try (Connection conexao = Conexao.conectar()) {
@@ -174,9 +90,8 @@ public class AtendimentoController {
                 if (equipamentoAtual != null) {
                     Cliente cliente = equipamentoAtual.getCliente();
 
-                    lblResultadoBusca.getStyleClass().add("mensagemSucesso");
+                    mensagem("✔ Equipamento encontrado", "mensagemSucesso");
 
-                    lblResultadoBusca.setText("✔ Equipamento encontrado");
                     cmbModelo.setValue(equipamentoAtual.getModelo());
                     txtNome.setText(cliente.getNome());
                     txtTelefone.setText(cliente.getTelefone());
@@ -213,18 +128,14 @@ public class AtendimentoController {
                         }
 
                 } else {
-                    lblResultadoBusca.setText("✖ Equipamento não encontrado");
-                    lblResultadoBusca.getStyleClass().add("mensagemErro");
+                    mensagem("✖ Equipamento não encontrado", "mensagemErro");
                     }
             } catch (SQLException e) {
-                lblResultadoBusca.setText("✖ Erro ao consultar o banco");
-                lblResultadoBusca.getStyleClass().add("mensagemErro");
+                mensagem("✖ Erro ao consultar o banco", "mensagemErro");
                 }
     }
 
-
-    private void limpaTela(){
-        txtNumeroSerie.clear();
+    private void limpaResultado(){
         txtEmpresa.clear();
         lblResultadoBusca.setText("");
         cmbModelo.getSelectionModel().clearSelection();
@@ -240,6 +151,11 @@ public class AtendimentoController {
         boxHistorico.getChildren().clear();
         lblHistoricoVazio.setVisible(true);
         lblHistoricoVazio.setManaged(true);
+    }
+
+    private void limpaTela(){
+        limpaResultado();
+        txtNumeroSerie.clear();
     }
     @FXML
     private void salvarAtendimento() { }
