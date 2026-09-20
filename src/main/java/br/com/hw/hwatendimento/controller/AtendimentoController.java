@@ -68,7 +68,6 @@ public class AtendimentoController {
             }
         });
     }
-
     @FXML
     private void buscarEquipamento() {
         limpaResultado();
@@ -161,9 +160,13 @@ public class AtendimentoController {
     }
     @FXML
     private void salvarAtendimento() {
-        LocalDate data = dtInicio.getValue();
-        LocalTime hora = LocalTime.parse(txtHoraInicio.getText());
-        LocalDateTime inicio = data.atTime(hora);
+        LocalDate dataI = dtInicio.getValue();
+        LocalTime horaI = LocalTime.parse(txtHoraInicio.getText());
+        LocalDateTime inicio = dataI.atTime(horaI);
+
+        LocalDate dataF = dtFim.getValue();
+        LocalTime horaF = LocalTime.parse(txtHoraFim.getText());
+        LocalDateTime fim = dataF.atTime(horaF);
     }
 
     @FXML
