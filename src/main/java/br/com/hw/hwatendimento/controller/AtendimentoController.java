@@ -191,6 +191,11 @@ public class AtendimentoController {
         if (!validadorCampo()){
             return;
         }
+        String numeroSerie = txtNumeroSerie.getText().toUpperCase();
+        if (equipamentoAtual != null && !numeroSerie.equals(equipamentoAtual.getNumeroSerie())) {
+            mensagem("✖ O número de série mudou. Clique em Buscar novamente", "mensagemErro");
+            return;
+        }
         LocalDate dataI = dtInicio.getValue();
         LocalTime horaI = LocalTime.parse(txtHoraInicio.getText());
         LocalDateTime inicio = dataI.atTime(horaI);
