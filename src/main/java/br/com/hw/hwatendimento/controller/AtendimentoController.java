@@ -27,14 +27,42 @@ public class AtendimentoController {
     @FXML private VBox boxHistorico;
     private Equipamento equipamentoAtual;
 
-    private void retornaInvalido(){
-        lblResultadoBusca.setText("✖ Número de serie invalido!");
-        lblResultadoBusca.getStyleClass().add("mensagemErro");
-    }
     private void mensagem(String mensagem, String classe){
         lblResultadoBusca.getStyleClass().removeAll("mensagemSucesso", "mensagemErro");
         lblResultadoBusca.setText(mensagem);
         lblResultadoBusca.getStyleClass().add(classe);
+    }
+    private boolean validadorCampo(){
+        String numeroSerie = txtNumeroSerie.getText().toUpperCase();
+        if (!numeroSerie.isBlank() && !ValidadorSerie.validar(numeroSerie)) {
+            mensagem("✖ Número de série inválido!", "mensagemErro");
+            return false;
+        }
+        if (cmbModelo.getValue() == null){
+            mensagem("✖ Selecione o modelo corretamente", "mensagemErro");
+            return false;
+        }
+        if (rbJuridica.isSelected() && txtEmpresa.getText().isBlank()){
+            mensagem("✖ Preencha o nome da empresa", "mensagemErro");
+            return false;
+        }
+        if (txtNome.getText().isBlank()) {
+            mensagem("✖ Preencha o nome", "mensagemErro");
+            return false;
+        }
+        if (txtTelefone.getText().isBlank()){
+            mensagem("✖ Preencha o telefone", "mensagemErro");
+            return false;
+        }
+        if (txtDescricao.getText().isBlank()){
+            mensagem("✖ Preencha a descrição", "mensagemErro");
+            return false;
+        }
+        if (dtInicio.getValue() == null || txtHoraInicio.getText().length() != 5){
+            mensagem("✖ Preencha a data e/ou hora corretamente", "mensagemErro");
+            return false;
+        }
+        return true;
     }
 
     @FXML
@@ -77,7 +105,7 @@ public class AtendimentoController {
 
             // Chama o validador de numero de serie
             if (!ValidadorSerie.validar(numeroSerie)){
-                retornaInvalido();
+                mensagem("✖ Número de serie invalido!", "mensagemErro");
                 return;
             }
 
@@ -160,13 +188,20 @@ public class AtendimentoController {
     }
     @FXML
     private void salvarAtendimento() {
+        if (!validadorCampo()){
+            return;
+        }
         LocalDate dataI = dtInicio.getValue();
         LocalTime horaI = LocalTime.parse(txtHoraInicio.getText());
         LocalDateTime inicio = dataI.atTime(horaI);
+        LocalDateTime fim = null;
 
-        LocalDate dataF = dtFim.getValue();
-        LocalTime horaF = LocalTime.parse(txtHoraFim.getText());
-        LocalDateTime fim = dataF.atTime(horaF);
+        if (dtFim.getValue() != null && txtHoraFim.getText().length() == 5) {
+            LocalDate dataF = dtFim.getValue();
+            LocalTime horaF = LocalTime.parse(txtHoraFim.getText());
+            fim = dataF.atTime(horaF);
+        }
+
     }
 
     @FXML
