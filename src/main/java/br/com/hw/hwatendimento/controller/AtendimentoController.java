@@ -188,23 +188,53 @@ public class AtendimentoController {
     }
     @FXML
     private void salvarAtendimento() {
+        String numeroSerie = txtNumeroSerie.getText().toUpperCase();
+        if (equipamentoAtual == null && !numeroSerie.isBlank()) {
+            buscarEquipamento();
+
+            if (equipamentoAtual != null) {
+                mensagem("✖ Esse equipamento já tem cliente vinculado. Confira os dados e salve novamente", "mensagemErro");
+                return;
+            }
+        }
+
         if (!validadorCampo()){
             return;
         }
-        String numeroSerie = txtNumeroSerie.getText().toUpperCase();
-        if (equipamentoAtual != null && !numeroSerie.equals(equipamentoAtual.getNumeroSerie())) {
-            mensagem("✖ O número de série mudou. Clique em Buscar novamente", "mensagemErro");
-            return;
-        }
+
         LocalDate dataI = dtInicio.getValue();
         LocalTime horaI = LocalTime.parse(txtHoraInicio.getText());
         LocalDateTime inicio = dataI.atTime(horaI);
         LocalDateTime fim = null;
 
+        if (equipamentoAtual != null && !numeroSerie.equals(equipamentoAtual.getNumeroSerie())) {
+            mensagem("✖ O número de série mudou. Clique em Buscar novamente", "mensagemErro");
+            return;
+        }
+
         if (dtFim.getValue() != null && txtHoraFim.getText().length() == 5) {
             LocalDate dataF = dtFim.getValue();
             LocalTime horaF = LocalTime.parse(txtHoraFim.getText());
             fim = dataF.atTime(horaF);
+        }
+
+        if (equipamentoAtual != null) {
+            Atendimento atendimento = new Atendimento();
+            atendimento.setEquipamento(equipamentoAtual);
+            atendimento.setCliente(equipamentoAtual.getCliente());
+            atendimento.setDataHoraInicio(inicio);
+            atendimento.setDataHoraFim(fim);
+            atendimento.setDescricao(txtDescricao.getText());
+
+            try (Connection conexao = Conexao.conectar()) {
+                AtendimentoRepository aRepo = new AtendimentoRepository();
+                aRepo.inserirAtendimento(conexao, atendimento);
+
+                limpaTela();
+                mensagem("✔ Atendimento salvo", "mensagemSucesso");
+            } catch (SQLException e) {
+                mensagem("✖ Erro ao salvar o atendimento", "mensagemErro");
+            }
         }
 
     }
