@@ -7,7 +7,7 @@ import br.com.hw.hwatendimento.model.Cliente;
 import br.com.hw.hwatendimento.model.Equipamento;
 public class EquipamentoRepository {
 
-    public Equipamento buscaNumeroSerie(Connection conexao, String numeroSerie) {
+    public Equipamento buscaNumeroSerie(Connection conexao, String numeroSerie) throws SQLException {
         String sql = "Select * from equipamento where numero_serie = ?";
         Equipamento equipamento = null;
 
@@ -19,20 +19,18 @@ public class EquipamentoRepository {
                     equipamento.setId(rs.getInt("id"));
                     equipamento.setModelo(rs.getString("modelo"));
                     equipamento.setNumeroSerie(rs.getString("numero_serie"));
-                        int clienteId = rs.getInt("cliente_id");
-                        ClienteRepository clienteRepo = new ClienteRepository();
+                    int clienteId = rs.getInt("cliente_id");
+                    ClienteRepository clienteRepo = new ClienteRepository();
                     equipamento.setCliente(clienteRepo.buscaId(conexao, clienteId));
                     equipamento.setCriadoEm(rs.getObject("criado_em", LocalDateTime.class));
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Erro ao buscar equipamento: " + e.getMessage());
         }
         return equipamento;
 
     }
 
-    public Equipamento inserirEquipamento(Connection conexao, Equipamento equipamento) {
+    public Equipamento inserirEquipamento(Connection conexao, Equipamento equipamento) throws SQLException {
         String sql = "insert into equipamento (modelo, numero_serie, cliente_id) values (?, ?, ?)";
 
         // Statement.RETURN_GENERATED_KEYS -> serve para pedir o id para o banco
@@ -48,14 +46,12 @@ public class EquipamentoRepository {
                     equipamento.setId(rs.getInt(1));
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Erro ao inserir equipamento: " + e.getMessage());
         }
         return equipamento;
     }
 
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws SQLException {
         //Cria o cliente
         Cliente cliente = new Cliente();
         cliente.setNome("Teste");

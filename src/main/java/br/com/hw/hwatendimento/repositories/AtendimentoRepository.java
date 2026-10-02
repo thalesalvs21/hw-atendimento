@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class AtendimentoRepository {
 
-    public Atendimento inserirAtendimento(Connection conexao, Atendimento atendimento) {
+    public Atendimento inserirAtendimento(Connection conexao, Atendimento atendimento) throws SQLException {
         String sql = "insert into atendimento (equipamento_id, cliente_id, data_hora_inicio, data_hora_fim, descricao) values (?, ?, ?, ?, ?)";
 
         // Statement.RETURN_GENERATED_KEYS -> serve para pedir o id para o banco
@@ -28,13 +28,11 @@ public class AtendimentoRepository {
                     atendimento.setId(rs.getInt(1));
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Erro ao inserir atendimento: " + e.getMessage());
         }
         return atendimento;
     }
 
-    public List<Atendimento> buscaPorEquipamento(Connection conexao, int equipamentoId){
+    public List<Atendimento> buscaPorEquipamento(Connection conexao, int equipamentoId) throws SQLException {
         String sql = "select * from atendimento where equipamento_id = ? order by data_hora_inicio desc";
         //Cria uma lista pra guardar obejetos apenas da classe atendimento
         List<Atendimento> lista = new ArrayList<>();
@@ -51,14 +49,12 @@ public class AtendimentoRepository {
                     lista.add(atendimento);
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Erro ao localizar atendimentos existentes: " + e.getMessage());
         }
         return lista;
     }
 
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws SQLException {
         // Busca pelo numero de serie e pega o id do equipamento
         EquipamentoRepository eRepo = new EquipamentoRepository();
         Equipamento equipamento = eRepo.buscaNumeroSerie(Conexao.conectar(), "TE090909999");

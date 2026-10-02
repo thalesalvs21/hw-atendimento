@@ -27,11 +27,23 @@ public class AtendimentoController {
     @FXML private VBox boxHistorico;
     private Equipamento equipamentoAtual;
 
+    private void aplicarModeloPelaSerie(String numeroSerie) {
+        String modelo = ValidadorSerie.modeloPorSerie(numeroSerie);
+
+        if (modelo != null) {
+            cmbModelo.setValue(modelo);
+            cmbModelo.setDisable(true);
+        } else {
+            cmbModelo.setDisable(false);
+        }
+    }
+
     private void mensagem(String mensagem, String classe){
         lblResultadoBusca.getStyleClass().removeAll("mensagemSucesso", "mensagemErro");
         lblResultadoBusca.setText(mensagem);
         lblResultadoBusca.getStyleClass().add(classe);
     }
+
     private boolean validadorCampo(){
         String numeroSerie = txtNumeroSerie.getText().toUpperCase();
         if (!numeroSerie.isBlank() && !ValidadorSerie.validar(numeroSerie)) {
@@ -108,6 +120,7 @@ public class AtendimentoController {
                 mensagem("✖ Número de serie invalido!", "mensagemErro");
                 return;
             }
+            aplicarModeloPelaSerie(numeroSerie);
 
             //Se o numero for valido, puxa os dados do cliente e o historico de atendimento e preenche na tela
             //Se não, devolve uma mensagem de equipamento não encontrado
@@ -120,7 +133,6 @@ public class AtendimentoController {
 
                     mensagem("✔ Equipamento encontrado", "mensagemSucesso");
 
-                    cmbModelo.setValue(equipamentoAtual.getModelo());
                     txtNome.setText(cliente.getNome());
                     txtTelefone.setText(cliente.getTelefone());
 
@@ -180,6 +192,7 @@ public class AtendimentoController {
         boxHistorico.getChildren().clear();
         lblHistoricoVazio.setVisible(true);
         lblHistoricoVazio.setManaged(true);
+        cmbModelo.setDisable(false);
     }
 
     private void limpaTela(){
@@ -189,10 +202,18 @@ public class AtendimentoController {
     @FXML
     private void salvarAtendimento() {
         String numeroSerie = txtNumeroSerie.getText().toUpperCase();
+
         if (equipamentoAtual == null && !numeroSerie.isBlank()) {
-            buscarEquipamento();
+            try (Connection conexao = Conexao.conectar()) {
+                EquipamentoRepository eRepo = new EquipamentoRepository();
+                equipamentoAtual = eRepo.buscaNumeroSerie(conexao, numeroSerie);
+            } catch (SQLException e) {
+                mensagem("✖ Erro ao consultar o banco", "mensagemErro");
+                return;
+            }
 
             if (equipamentoAtual != null) {
+                buscarEquipamento();
                 mensagem("✖ Esse equipamento já tem cliente vinculado. Confira os dados e salve novamente", "mensagemErro");
                 return;
             }
@@ -235,8 +256,65 @@ public class AtendimentoController {
             } catch (SQLException e) {
                 mensagem("✖ Erro ao salvar o atendimento", "mensagemErro");
             }
-        }
+        } else{
+            Connection conexao = null;
+            try {
+                conexao = Conexao.conectar();
+                conexao.setAutoCommit(false);
 
+                Cliente cliente = new Cliente();
+                cliente.setNome(txtNome.getText());
+                if (rbJuridica.isSelected()) {
+                    cliente.setTipo("J");
+                } else {
+                    cliente.setTipo("F");
+                }
+
+                if (rbJuridica.isSelected()){
+                    cliente.setNomeEmpresa(txtEmpresa.getText());
+                } else {
+                    cliente.setNomeEmpresa(null);
+                }
+                cliente.setTelefone(txtTelefone.getText().replaceAll("\\D", ""));
+
+                ClienteRepository cRepo = new ClienteRepository();
+                cRepo.inserirCliente(conexao, cliente);
+
+                Equipamento equipamento = new Equipamento();
+                equipamento.setModelo(cmbModelo.getValue());
+                equipamento.setNumeroSerie(numeroSerie.isBlank() ? null : numeroSerie);
+                equipamento.setCliente(cliente);
+
+                EquipamentoRepository eRepo = new EquipamentoRepository();
+                eRepo.inserirEquipamento(conexao, equipamento);
+
+                Atendimento atendimento = new Atendimento();
+                atendimento.setCliente(cliente);
+                atendimento.setEquipamento(equipamento);
+                atendimento.setDataHoraInicio(inicio);
+                atendimento.setDataHoraFim(fim);
+                atendimento.setDescricao(txtDescricao.getText());
+
+                AtendimentoRepository aRepo = new AtendimentoRepository();
+                aRepo.inserirAtendimento(conexao, atendimento);
+
+                conexao.commit();
+                limpaTela();
+                mensagem("✔ Atendimento salvo", "mensagemSucesso");
+
+            } catch (SQLException e) {
+                if (conexao != null) {
+                    try { conexao.rollback();
+                    } catch (SQLException ex) { }
+                }
+                mensagem("✖ Erro ao salvar", "mensagemErro");
+            } finally {
+                if (conexao != null) {
+                    try { conexao.close();
+                    } catch (SQLException ex) { }
+                }
+            }
+        }
     }
 
     @FXML

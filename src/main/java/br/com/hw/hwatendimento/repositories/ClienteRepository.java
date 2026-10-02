@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 public class ClienteRepository {
 
-    public Cliente buscaId(Connection conexao, int idBusca){
+    public Cliente buscaId(Connection conexao, int idBusca) throws SQLException {
         String sql = "select * from cliente where id = ?";
         Cliente cliente = null;
 
@@ -24,13 +24,11 @@ public class ClienteRepository {
                     cliente.setCriadoEm(rs.getObject("criado_em", LocalDateTime.class));
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Erro ao buscar cliente: " + e.getMessage());
         }
         return cliente;
     }
 
-    public Cliente inserirCliente(Connection conexao, Cliente cliente) {
+    public Cliente inserirCliente(Connection conexao, Cliente cliente) throws SQLException {
         String sql = "insert into cliente (tipo, nome, nome_empresa, telefone) values (?, ?, ?, ?)";
 
         // Statement.RETURN_GENERATED_KEYS -> serve para pedir o id para o banco
@@ -47,14 +45,12 @@ public class ClienteRepository {
                     cliente.setId(rs.getInt(1));
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Erro ao inserir cliente: " + e.getMessage());
         }
         return cliente;
     }
 
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws SQLException {
         // cria o cliente primeiro e depois roda o insert
         Cliente cliente = new Cliente();
         cliente.setNome("Teste");

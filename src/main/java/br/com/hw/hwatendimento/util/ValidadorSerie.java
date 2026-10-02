@@ -40,4 +40,21 @@ public class ValidadorSerie {
         }
         return true;
     }
+
+    public static String modeloPorSerie(String serie) {
+        if (serie == null || serie.length() < 4) {
+            return null;
+        }
+        String prefixo = serie.substring(0, 2);
+        String versao  = serie.substring(2, 4);
+
+
+        if (prefixo.equals("EC") && versao.equals("11")) return "ECGV11";
+        if (prefixo.equals("EC")) return "ECGV6";
+        if (prefixo.equals("TE")) return "Ergo13";
+        if (prefixo.equals("TP")) return "ErgoCP";
+        if (prefixo.equals("TC")) return "ErgoMET13";
+
+        return null;
+    }
 }
