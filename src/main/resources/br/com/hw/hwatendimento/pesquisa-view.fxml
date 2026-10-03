@@ -1,14 +1,136 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<BorderPane prefHeight="720.0" prefWidth="1100.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.hw.hwatendimento.controller.PesquisaController">
+   <top>
+      <HBox styleClass="barraTopo">
+         <children>
+            <ImageView fitHeight="28.0" preserveRatio="true">
+               <image>
+                  <Image url="@assets/logo-mobile.png"/>
+               </image>
+            </ImageView>
+            <Label styleClass="marca" text="Atendimento"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblDataHora" styleClass="barraTopoInfo" text=""/>
+         </children>
+      </HBox>
+   </top>
+   <center>
+      <VBox styleClass="formulario">
+         <children>
+            <Label styleClass="tituloPagina" text="Pesquisar atendimentos"/>
+            <Label styleClass="notaPagina" text="Deixe um filtro em branco para ignorá-lo."/>
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+               <children>
+                  <Label styleClass="tituloSecao" text="Filtros"/>
+                  <Separator HBox.hgrow="ALWAYS"/>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="12.0" top="14.0"/>
+               </VBox.margin>
+            </HBox>
+            <HBox spacing="16.0">
+               <children>
+                  <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="rotuloCampo" text="De"/>
+                        <DatePicker fx:id="dtDe" editable="false" maxWidth="Infinity" promptText="Início do período"/>
+                     </children>
+                  </VBox>
+                  <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="rotuloCampo" text="Até"/>
+                        <DatePicker fx:id="dtAte" editable="false" maxWidth="Infinity" promptText="Fim do período"/>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox spacing="16.0">
+               <children>
+                  <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="rotuloCampo" text="Nome do cliente"/>
+                        <TextField fx:id="txtNomeFiltro" maxWidth="Infinity" promptText="Nome ou parte do nome"/>
+                     </children>
+                  </VBox>
+                  <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="rotuloCampo" text="Número de série"/>
+                        <TextField fx:id="txtSerieFiltro" maxWidth="Infinity" promptText="XX000000000"/>
+                     </children>
+                  </VBox>
+               </children>
+               <VBox.margin>
+                  <Insets top="12.0"/>
+               </VBox.margin>
+            </HBox>
+            <HBox spacing="16.0">
+               <children>
+                  <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="rotuloCampo" text="Descrição contém"/>
+                        <TextField fx:id="txtDescricaoFiltro" maxWidth="Infinity" promptText="Ex.: software"/>
+                     </children>
+                  </VBox>
+                  <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="rotuloCampo" text="Telefone"/>
+                        <TextField fx:id="txtTelefoneFiltro" maxWidth="Infinity" promptText="(00) 00000-0000"/>
+                     </children>
+                  </VBox>
+               </children>
+               <VBox.margin>
+                  <Insets top="12.0"/>
+               </VBox.margin>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Button fx:id="btnPesquisar" defaultButton="true" mnemonicParsing="false" onAction="#pesquisar" styleClass="botaoSecundario" text="Pesquisar"/>
+                  <Button fx:id="btnLimparFiltros" mnemonicParsing="false" onAction="#limparFiltros" styleClass="botaoDiscreto" text="Limpar filtros"/>
+                  <Region HBox.hgrow="ALWAYS"/>
+                  <Label fx:id="lblStatusPesquisa" styleClass="mensagem" text=""/>
+               </children>
+               <VBox.margin>
+                  <Insets top="16.0"/>
+               </VBox.margin>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+               <children>
+                  <Label styleClass="tituloSecao" text="Resultados"/>
+                  <Separator HBox.hgrow="ALWAYS"/>
+                  <Label fx:id="lblTotal" styleClass="barraTopoInfo" text=""/>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="10.0" top="20.0"/>
+               </VBox.margin>
+            </HBox>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="br.com.hw.hwatendimento.controller.PesquisaController"
-            prefHeight="400.0" prefWidth="600.0">
-
-</AnchorPane>
+            <TableView fx:id="tblResultados" VBox.vgrow="ALWAYS">
+               <columns>
+                  <TableColumn fx:id="colData" prefWidth="130.0" text="Início"/>
+                  <TableColumn fx:id="colModelo" prefWidth="110.0" text="Modelo"/>
+                  <TableColumn fx:id="colSerie" prefWidth="130.0" text="Nº de série"/>
+                  <TableColumn fx:id="colCliente" prefWidth="180.0" text="Cliente"/>
+                  <TableColumn fx:id="colTelefone" prefWidth="130.0" text="Telefone"/>
+                  <TableColumn fx:id="colDuracao" prefWidth="90.0" text="Duração"/>
+                  <TableColumn fx:id="colDescricao" prefWidth="280.0" text="Descrição"/>
+               </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+               </columnResizePolicy>
+            </TableView>
+         </children>
+      </VBox>
+   </center>
+   <bottom>
+      <HBox styleClass="barraAcoes">
+         <children>
+            <Button fx:id="btnVoltar" mnemonicParsing="false" onAction="#voltar" styleClass="botaoDiscreto" text="Voltar"/>
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>

@@ -108,6 +108,7 @@ public class AtendimentoController {
             }
         });
     }
+
     @FXML
     private void buscarEquipamento() {
         limpaResultado();
@@ -199,6 +200,7 @@ public class AtendimentoController {
         limpaResultado();
         txtNumeroSerie.clear();
     }
+
     @FXML
     private void salvarAtendimento() {
         String numeroSerie = txtNumeroSerie.getText().toUpperCase();
@@ -256,6 +258,7 @@ public class AtendimentoController {
             } catch (SQLException e) {
                 mensagem("✖ Erro ao salvar o atendimento", "mensagemErro");
             }
+
         } else{
             Connection conexao = null;
             try {
