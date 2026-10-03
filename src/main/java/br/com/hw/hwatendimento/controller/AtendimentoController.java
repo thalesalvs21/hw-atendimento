@@ -1,5 +1,6 @@
 package br.com.hw.hwatendimento.controller;
 import br.com.hw.hwatendimento.util.Mascaras;
+import br.com.hw.hwatendimento.util.Navegacao;
 import br.com.hw.hwatendimento.util.ValidadorSerie;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,6 +27,11 @@ public class AtendimentoController {
     @FXML private DatePicker dtInicio, dtFim;
     @FXML private VBox boxHistorico;
     private Equipamento equipamentoAtual;
+
+    @FXML
+    private void abrirPesquisa() {
+        Navegacao.trocarTela(txtNumeroSerie, "pesquisa-view.fxml");
+    }
 
     private void aplicarModeloPelaSerie(String numeroSerie) {
         String modelo = ValidadorSerie.modeloPorSerie(numeroSerie);

@@ -18,6 +18,7 @@
                 </ImageView>
                 <Label styleClass="marca" text="Atendimento" />
                 <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="btnIrPesquisa" mnemonicParsing="false" onAction="#abrirPesquisa" styleClass="botaoBarraTopo" text="Pesquisar" />
                 <Label fx:id="lblDataHora" styleClass="barraTopoInfo" text="" />
             </children>
         </HBox>
