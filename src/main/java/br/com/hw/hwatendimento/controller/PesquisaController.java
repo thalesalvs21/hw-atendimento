@@ -27,6 +27,9 @@ public class PesquisaController {
     private void initialize() {
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
+        // Ensina a tabela o que mostrar em cada coluna: o que esta entre
+        // parenteses e executado uma vez por linha, e "dado.getValue()"
+        // e o Atendimento daquela linha.
         colData.setCellValueFactory(dado ->
                 new SimpleStringProperty(dado.getValue().getDataHoraInicio().format(formato)));
 
