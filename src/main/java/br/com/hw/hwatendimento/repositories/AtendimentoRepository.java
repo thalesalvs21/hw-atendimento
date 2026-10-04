@@ -3,6 +3,7 @@ import br.com.hw.hwatendimento.model.Atendimento;
 import br.com.hw.hwatendimento.model.Cliente;
 import br.com.hw.hwatendimento.model.Equipamento;
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -53,11 +54,97 @@ public class AtendimentoRepository {
         return lista;
     }
 
+    public List<Atendimento> pesquisar(Connection conexao, LocalDate de, LocalDate ate, String nome, String serie, String descricao, String telefone) throws SQLException {
+
+        StringBuilder sql = new StringBuilder(
+                "select a.*, e.modelo, e.numero_serie, c.nome, c.nome_empresa, c.telefone, c.tipo " +
+                        "from atendimento a " +
+                        "join equipamento e on e.id = a.equipamento_id " +
+                        "join cliente c on c.id = a.cliente_id " +
+                        "where 1=1"
+        );
+
+        List<Object> valores = new ArrayList<>();
+
+        if (de != null) {
+            sql.append(" and a.data_hora_inicio >= ?");
+            valores.add(de.atStartOfDay());
+        }
+
+        if (ate != null) {
+            sql.append(" and a.data_hora_inicio < ?");
+            valores.add(ate.plusDays(1).atStartOfDay());
+        }
+
+        if (nome != null && !nome.isBlank()) {
+            sql.append(" and c.nome like ?");
+            valores.add("%" + nome.trim() + "%");
+        }
+
+        if (serie != null && !serie.isBlank()) {
+            sql.append(" and e.numero_serie like ?");
+            valores.add(serie.trim().toUpperCase() + "%");
+        }
+
+        if (descricao != null && !descricao.isBlank()) {
+            sql.append(" and a.descricao like ?");
+            valores.add("%" + descricao.trim() + "%");
+        }
+
+        if (telefone != null && !telefone.isBlank()) {
+            String somenteDigitos = telefone.replaceAll("\\D", "");
+            if (!somenteDigitos.isBlank()) {
+                sql.append(" and c.telefone like ?");
+                valores.add("%" + somenteDigitos + "%");
+            }
+        }
+
+        sql.append(" order by a.data_hora_inicio desc");
+
+        List<Atendimento> lista = new ArrayList<>();
+
+        try (PreparedStatement stmt = conexao.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < valores.size(); i++) {
+                stmt.setObject(i + 1, valores.get(i));
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Atendimento atendimento = new Atendimento();
+                    atendimento.setId(rs.getInt("id"));
+                    atendimento.setDataHoraInicio(rs.getObject("data_hora_inicio", LocalDateTime.class));
+                    atendimento.setDataHoraFim(rs.getObject("data_hora_fim", LocalDateTime.class));
+                    atendimento.setDescricao(rs.getString("descricao"));
+
+                    Equipamento equipamento = new Equipamento();
+                    equipamento.setId(rs.getInt("equipamento_id"));
+                    equipamento.setModelo(rs.getString("modelo"));
+                    equipamento.setNumeroSerie(rs.getString("numero_serie"));
+                    atendimento.setEquipamento(equipamento);
+
+                    Cliente cliente = new Cliente();
+                    cliente.setId(rs.getInt("cliente_id"));
+                    cliente.setNome(rs.getString("nome"));
+                    cliente.setNomeEmpresa(rs.getString("nome_empresa"));
+                    cliente.setTelefone(rs.getString("telefone"));
+                    cliente.setTipo(rs.getString("tipo"));
+                    atendimento.setCliente(cliente);
+
+                    lista.add(atendimento);
+                }
+            }
+        }
+        return lista;
+    }
+
+
+
 
     public static void main(String[] args) throws SQLException {
         // Busca pelo numero de serie e pega o id do equipamento
         EquipamentoRepository eRepo = new EquipamentoRepository();
-        Equipamento equipamento = eRepo.buscaNumeroSerie(Conexao.conectar(), "TE090909999");
+        Equipamento equipamento = eRepo.buscaNumeroSerie(Conexao.conectar(), "TE100909999");
         if (equipamento != null) {
             //Chama o metodo e guarda numa lista
             AtendimentoRepository repo = new AtendimentoRepository();
@@ -80,7 +167,7 @@ public class AtendimentoRepository {
         cRepo.inserirCliente(Conexao.conectar(), cliente);
 
         EquipamentoRepository eRepo = new EquipamentoRepository();
-        Equipamento equipamento = eRepo.buscaNumeroSerie(Conexao.conectar(), "TE090909999");
+        Equipamento equipamento = eRepo.buscaNumeroSerie(Conexao.conectar(), "TE100909999");
 
         if (equipamento != null) {
             Atendimento atendimento = new Atendimento();
