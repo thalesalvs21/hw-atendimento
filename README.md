@@ -150,10 +150,6 @@ Java instalado.
 
 ## Melhorias futuras
 
-- Backup agendado (`mysqldump` no Agendador de Tarefas, gravando em outra
-  máquina)
-- Campos de contato por atendimento, para quando o cliente é uma empresa e cada
-  chamado é aberto por uma pessoa diferente
 - Validar horas impossíveis como `99:99`
 - Avisar quando o término for preenchido pela metade (só a data ou só a hora)
 - Botão "ver todos" no histórico lateral
