@@ -257,6 +257,9 @@
     -fx-text-fill: #6B7A88;
 }
 
+.mensagemCarregando {
+    -fx-text-fill: #a84803;
+}
 .mensagemSucesso {
     -fx-text-fill: #0077B6;
 }

@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import javafx.concurrent.Task;
 
 public class AtendimentoController {
     @FXML private TextField txtNumeroSerie, txtEmpresa, txtNome, txtTelefone, txtHoraFim, txtHoraInicio;
@@ -26,6 +27,8 @@ public class AtendimentoController {
     @FXML private RadioButton rbJuridica, rbFisica;
     @FXML private DatePicker dtInicio, dtFim;
     @FXML private VBox boxHistorico;
+    @FXML private Button btnBuscar, btnSalvar;
+    private List<Atendimento> historicoCarregado;
     private Equipamento equipamentoAtual;
 
     @FXML
@@ -122,65 +125,81 @@ public class AtendimentoController {
         txtNumeroSerie.setText(txtNumeroSerie.getText().toUpperCase());
         String numeroSerie = txtNumeroSerie.getText();
 
-            // Chama o validador de numero de serie
-            if (!ValidadorSerie.validar(numeroSerie)){
-                mensagem("✖ Número de serie invalido!", "mensagemErro");
+        if (!ValidadorSerie.validar(numeroSerie)){
+            mensagem("✖ Número de serie invalido!", "mensagemErro");
+            return;
+        }
+        aplicarModeloPelaSerie(numeroSerie);
+
+        mensagem("Buscando...", "mensagemCarregando");
+        btnBuscar.setDisable(true);
+
+        Task<Equipamento> tarefa = new Task<>() {
+            @Override
+            protected Equipamento call() throws Exception {
+                // roda em paralelo, sem travar a tela
+                try (Connection conexao = Conexao.conectar()) {
+                    EquipamentoRepository eRepo = new EquipamentoRepository();
+                    Equipamento encontrado = eRepo.buscaNumeroSerie(conexao, numeroSerie);
+
+                    if (encontrado != null) {
+                        AtendimentoRepository aRepo = new AtendimentoRepository();
+                        historicoCarregado = aRepo.buscaPorEquipamento(conexao, encontrado.getId());
+                    }
+                    return encontrado;
+                }
+            }
+        };
+
+        tarefa.setOnSucceeded(e -> {
+            btnBuscar.setDisable(false);
+            equipamentoAtual = tarefa.getValue();
+
+            if (equipamentoAtual == null) {
+                mensagem("✖ Equipamento não encontrado", "mensagemErro");
                 return;
             }
-            aplicarModeloPelaSerie(numeroSerie);
 
-            //Se o numero for valido, puxa os dados do cliente e o historico de atendimento e preenche na tela
-            //Se não, devolve uma mensagem de equipamento não encontrado
-            try (Connection conexao = Conexao.conectar()) {
-                EquipamentoRepository eRepo = new EquipamentoRepository();
-                equipamentoAtual = eRepo.buscaNumeroSerie(conexao, numeroSerie);
+            Cliente cliente = equipamentoAtual.getCliente();
+            mensagem("✔ Equipamento encontrado", "mensagemSucesso");
 
-                if (equipamentoAtual != null) {
-                    Cliente cliente = equipamentoAtual.getCliente();
+            txtNome.setText(cliente.getNome());
+            txtTelefone.setText(cliente.getTelefone());
 
-                    mensagem("✔ Equipamento encontrado", "mensagemSucesso");
-
-                    txtNome.setText(cliente.getNome());
-                    txtTelefone.setText(cliente.getTelefone());
-
-                    if ("J".equals(cliente.getTipo())){
-                        rbJuridica.setSelected(true);
-                        txtEmpresa.setText(cliente.getNomeEmpresa());
-                    } else {
-                        rbFisica.setSelected(true);
-                        txtEmpresa.setText(null);
-                    }
-
-                    // Exibir historico de atendimentos
-                    boxHistorico.getChildren().clear();
-                    lblHistoricoVazio.setVisible(false);
-                    lblHistoricoVazio.setManaged(false);
-
-                    AtendimentoRepository aRepo = new AtendimentoRepository();
-
-                    List<Atendimento> historico = aRepo.buscaPorEquipamento(conexao, equipamentoAtual.getId());
-                    for (Atendimento atendimento : historico) {
-                        Label lblData = new Label(atendimento.getDataHoraInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
-                        Label lblDescricao = new Label(atendimento.getDescricao());
-
-                        VBox bloco = new VBox(lblData, lblDescricao);
-                        boxHistorico.getChildren().add(bloco);
-
-                        lblData.getStyleClass().add("historicoData");
-                        lblDescricao.getStyleClass().add("historicoTexto");
-                        lblDescricao.setWrapText(true);
-                        lblDescricao.setMaxWidth(Double.MAX_VALUE);
-
-                        bloco.getStyleClass().add("historicoItem");
-                    }
-
-                } else {
-                    mensagem("✖ Equipamento não encontrado", "mensagemErro");
-                    }
+            if ("J".equals(cliente.getTipo())){
+                rbJuridica.setSelected(true);
+                txtEmpresa.setText(cliente.getNomeEmpresa());
+            } else {
+                rbFisica.setSelected(true);
+                txtEmpresa.setText(null);
             }
-            catch (SQLException e) {
-                mensagem("✖ Erro ao consultar o banco", "mensagemErro");
+
+            boxHistorico.getChildren().clear();
+            lblHistoricoVazio.setVisible(false);
+            lblHistoricoVazio.setManaged(false);
+
+            for (Atendimento atendimento : historicoCarregado) {
+                Label lblData = new Label(atendimento.getDataHoraInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+                Label lblDescricao = new Label(atendimento.getDescricao());
+
+                VBox bloco = new VBox(lblData, lblDescricao);
+                boxHistorico.getChildren().add(bloco);
+
+                lblData.getStyleClass().add("historicoData");
+                lblDescricao.getStyleClass().add("historicoTexto");
+                lblDescricao.setWrapText(true);
+                lblDescricao.setMaxWidth(Double.MAX_VALUE);
+
+                bloco.getStyleClass().add("historicoItem");
             }
+        });
+
+        tarefa.setOnFailed(e -> {
+            btnBuscar.setDisable(false);
+            mensagem("✖ Erro ao consultar o banco", "mensagemErro");
+        });
+
+        new Thread(tarefa).start();
     }
 
     private void limpaResultado(){
@@ -211,22 +230,45 @@ public class AtendimentoController {
     private void salvarAtendimento() {
         String numeroSerie = txtNumeroSerie.getText().toUpperCase();
 
+        // Serie preenchida mas ninguem clicou em Buscar: o app consulta sozinho para saber se cria equipamento novo ou nao
         if (equipamentoAtual == null && !numeroSerie.isBlank()) {
-            try (Connection conexao = Conexao.conectar()) {
-                EquipamentoRepository eRepo = new EquipamentoRepository();
-                equipamentoAtual = eRepo.buscaNumeroSerie(conexao, numeroSerie);
-            } catch (SQLException e) {
-                mensagem("✖ Erro ao consultar o banco", "mensagemErro");
-                return;
-            }
+            mensagem("Verificando...", "mensagemCarregando");
+            btnSalvar.setDisable(true);
 
-            if (equipamentoAtual != null) {
-                buscarEquipamento();
-                mensagem("✖ Esse equipamento já tem cliente vinculado. Confira os dados e salve novamente", "mensagemErro");
-                return;
-            }
+            Task<Equipamento> tarefa = new Task<>() {
+                @Override
+                protected Equipamento call() throws Exception {
+                    try (Connection conexao = Conexao.conectar()) {
+                        EquipamentoRepository eRepo = new EquipamentoRepository();
+                        return eRepo.buscaNumeroSerie(conexao, numeroSerie);
+                    }
+                }
+            };
+
+            tarefa.setOnSucceeded(e -> {
+                btnSalvar.setDisable(false);
+                equipamentoAtual = tarefa.getValue();
+
+                if (equipamentoAtual != null) {
+                    buscarEquipamento();
+                    return;
+                }
+                continuarSalvamento(numeroSerie);
+            });
+
+            tarefa.setOnFailed(e -> {
+                btnSalvar.setDisable(false);
+                mensagem("✖ Erro ao consultar o banco", "mensagemErro");
+            });
+
+            new Thread(tarefa).start();
+            return;
         }
 
+        continuarSalvamento(numeroSerie);
+    }
+
+    private void continuarSalvamento(String numeroSerie) {
         if (!validadorCampo()){
             return;
         }
@@ -247,83 +289,90 @@ public class AtendimentoController {
             fim = dataF.atTime(horaF);
         }
 
+        // os objetos sao montados aqui, lendo a tela, porque dentro da tarefa nao se pode acessar componente de tela
+        Atendimento atendimento = new Atendimento();
+        atendimento.setDataHoraInicio(inicio);
+        atendimento.setDataHoraFim(fim);
+        atendimento.setDescricao(txtDescricao.getText());
+
         if (equipamentoAtual != null) {
-            Atendimento atendimento = new Atendimento();
             atendimento.setEquipamento(equipamentoAtual);
             atendimento.setCliente(equipamentoAtual.getCliente());
-            atendimento.setDataHoraInicio(inicio);
-            atendimento.setDataHoraFim(fim);
-            atendimento.setDescricao(txtDescricao.getText());
+            gravar(atendimento, null, null);
 
-            try (Connection conexao = Conexao.conectar()) {
-                AtendimentoRepository aRepo = new AtendimentoRepository();
-                aRepo.inserirAtendimento(conexao, atendimento);
+        } else {
+            Cliente cliente = new Cliente();
+            cliente.setNome(txtNome.getText());
+            cliente.setTipo(rbJuridica.isSelected() ? "J" : "F");
+            cliente.setNomeEmpresa(rbJuridica.isSelected() ? txtEmpresa.getText() : null);
+            cliente.setTelefone(txtTelefone.getText().replaceAll("\\D", ""));
 
-                limpaTela();
-                mensagem("✔ Atendimento salvo", "mensagemSucesso");
-            } catch (SQLException e) {
-                mensagem("✖ Erro ao salvar o atendimento", "mensagemErro");
-            }
+            Equipamento equipamento = new Equipamento();
+            equipamento.setModelo(cmbModelo.getValue());
+            equipamento.setNumeroSerie(numeroSerie.isBlank() ? null : numeroSerie);
+            equipamento.setCliente(cliente);
 
-        } else{
-            Connection conexao = null;
-            try {
-                conexao = Conexao.conectar();
-                conexao.setAutoCommit(false);
-
-                Cliente cliente = new Cliente();
-                cliente.setNome(txtNome.getText());
-                if (rbJuridica.isSelected()) {
-                    cliente.setTipo("J");
-                } else {
-                    cliente.setTipo("F");
-                }
-
-                if (rbJuridica.isSelected()){
-                    cliente.setNomeEmpresa(txtEmpresa.getText());
-                } else {
-                    cliente.setNomeEmpresa(null);
-                }
-                cliente.setTelefone(txtTelefone.getText().replaceAll("\\D", ""));
-
-                ClienteRepository cRepo = new ClienteRepository();
-                cRepo.inserirCliente(conexao, cliente);
-
-                Equipamento equipamento = new Equipamento();
-                equipamento.setModelo(cmbModelo.getValue());
-                equipamento.setNumeroSerie(numeroSerie.isBlank() ? null : numeroSerie);
-                equipamento.setCliente(cliente);
-
-                EquipamentoRepository eRepo = new EquipamentoRepository();
-                eRepo.inserirEquipamento(conexao, equipamento);
-
-                Atendimento atendimento = new Atendimento();
-                atendimento.setCliente(cliente);
-                atendimento.setEquipamento(equipamento);
-                atendimento.setDataHoraInicio(inicio);
-                atendimento.setDataHoraFim(fim);
-                atendimento.setDescricao(txtDescricao.getText());
-
-                AtendimentoRepository aRepo = new AtendimentoRepository();
-                aRepo.inserirAtendimento(conexao, atendimento);
-
-                conexao.commit();
-                limpaTela();
-                mensagem("✔ Atendimento salvo", "mensagemSucesso");
-
-            } catch (SQLException e) {
-                if (conexao != null) {
-                    try { conexao.rollback();
-                    } catch (SQLException ex) { }
-                }
-                mensagem("✖ Erro ao salvar", "mensagemErro");
-            } finally {
-                if (conexao != null) {
-                    try { conexao.close();
-                    } catch (SQLException ex) { }
-                }
-            }
+            atendimento.setEquipamento(equipamento);
+            atendimento.setCliente(cliente);
+            gravar(atendimento, cliente, equipamento);
         }
+    }
+
+    // Quando cliente e equipamento vem nulos, significa que ja existem no banco e so o atendimento precisa ser inserido
+    private void gravar(Atendimento atendimento, Cliente cliente, Equipamento equipamento) {
+        mensagem("Salvando...", "mensagemCarregando");
+        btnSalvar.setDisable(true);
+
+        Task<Void> tarefa = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                Connection conexao = null;
+                try {
+                    conexao = Conexao.conectar();
+                    // Desliga o gravar-na-hora: os inserts ficam pendentes ate o commit
+                    conexao.setAutoCommit(false);
+
+                    if (cliente != null) {
+                        ClienteRepository cRepo = new ClienteRepository();
+                        cRepo.inserirCliente(conexao, cliente);
+
+                        EquipamentoRepository eRepo = new EquipamentoRepository();
+                        eRepo.inserirEquipamento(conexao, equipamento);
+                    }
+
+                    AtendimentoRepository aRepo = new AtendimentoRepository();
+                    aRepo.inserirAtendimento(conexao, atendimento);
+
+                    conexao.commit();
+
+                } catch (SQLException e) {
+                    // Algum insert falhou: desfaz todos
+                    if (conexao != null) {
+                        try { conexao.rollback(); } catch (SQLException ex) { }
+                    }
+                    throw e;
+
+                } finally {
+                    if (conexao != null) {
+                        try { conexao.close(); } catch (SQLException ex) { }
+                    }
+                }
+                return null;
+            }
+        };
+
+        tarefa.setOnSucceeded(e -> {
+            btnSalvar.setDisable(false);
+            limpaTela();
+            mensagem("✔ Atendimento salvo", "mensagemSucesso");
+        });
+
+        tarefa.setOnFailed(e -> {
+            btnSalvar.setDisable(false);
+            mensagem("✖ Erro ao salvar", "mensagemErro");
+        });
+
+        new Thread(tarefa).start();
     }
 
     @FXML

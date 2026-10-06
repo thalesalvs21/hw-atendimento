@@ -1,6 +1,7 @@
 package br.com.hw.hwatendimento.controller;
 
 import br.com.hw.hwatendimento.model.Atendimento;
+import br.com.hw.hwatendimento.controller.AtendimentoController;
 import br.com.hw.hwatendimento.model.Cliente;
 import br.com.hw.hwatendimento.repositories.AtendimentoRepository;
 import br.com.hw.hwatendimento.repositories.Conexao;
@@ -8,11 +9,13 @@ import br.com.hw.hwatendimento.util.Mascaras;
 import br.com.hw.hwatendimento.util.Navegacao;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -22,6 +25,7 @@ public class PesquisaController {
     @FXML private Label lblStatusPesquisa, lblTotal;
     @FXML private TableView<Atendimento> tblResultados;
     @FXML private TableColumn<Atendimento, String> colData, colModelo, colSerie, colCliente, colTelefone, colDuracao, colDescricao;
+    @FXML private Button btnPesquisar;
 
     @FXML
     private void initialize() {
@@ -60,6 +64,12 @@ public class PesquisaController {
         Mascaras.serie(txtSerieFiltro);
     }
 
+    private void mensagem(String mensagem, String classe){
+        lblStatusPesquisa.getStyleClass().removeAll("mensagemSucesso", "mensagemErro", "mensagemCarregando");
+        lblStatusPesquisa.setText(mensagem);
+        lblStatusPesquisa.getStyleClass().add(classe);
+    }
+
     private String calcularDuracao(Atendimento atendimento) {
         if (atendimento.getDataHoraFim() == null) {
             return "em aberto";
@@ -70,25 +80,44 @@ public class PesquisaController {
 
     @FXML
     private void pesquisar() {
-        try (Connection conexao = Conexao.conectar()) {
-            AtendimentoRepository repo = new AtendimentoRepository();
-            List<Atendimento> resultados = repo.pesquisar(
-                    conexao,
-                    dtDe.getValue(),
-                    dtAte.getValue(),
-                    txtNomeFiltro.getText(),
-                    txtSerieFiltro.getText(),
-                    txtDescricaoFiltro.getText(),
-                    txtTelefoneFiltro.getText()
-            );
+        mensagem("Buscando....", "mensagemCarregando");
+        btnPesquisar.setDisable(true);
 
+        // guarda os valores dos campos antes, porque la dentro nao se pode mexer na tela.
+        LocalDate de = dtDe.getValue();
+        LocalDate ate = dtAte.getValue();
+        String nome = txtNomeFiltro.getText();
+        String serie = txtSerieFiltro.getText();
+        String descricao = txtDescricaoFiltro.getText();
+        String telefone = txtTelefoneFiltro.getText();
+
+        Task<List<Atendimento>> tarefa = new Task<>() {
+            @Override
+            protected List<Atendimento> call() throws Exception {
+                // isso roda em paralelo, sem travar a tela (tenta fazer a conexão sem que o programa crashe)
+                try (Connection conexao = Conexao.conectar()) {
+                    AtendimentoRepository repo = new AtendimentoRepository();
+                    return repo.pesquisar(conexao, de, ate, nome, serie, descricao, telefone);
+                }
+            }
+        };
+
+        // chamado quando a busca termina bem
+        tarefa.setOnSucceeded(e -> {
+            List<Atendimento> resultados = tarefa.getValue();
             tblResultados.setItems(FXCollections.observableArrayList(resultados));
             lblTotal.setText(resultados.size() + " atendimento(s)");
-            lblStatusPesquisa.setText("");
+            mensagem("Busca dos registros concluida!", "mensagemSucesso");
+            btnPesquisar.setDisable(false);
+        });
 
-        } catch (SQLException e) {
-            lblStatusPesquisa.setText("✖ Erro ao consultar o banco");
-        }
+        // chamado quando da erro
+        tarefa.setOnFailed(e -> {
+            mensagem("✖ Erro ao consultar o banco", "mensagemErro");
+            btnPesquisar.setDisable(false);
+        });
+
+        new Thread(tarefa).start();
     }
 
     @FXML
