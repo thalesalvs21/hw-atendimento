@@ -419,3 +419,56 @@
     -fx-font-size: 13px;
     -fx-text-fill: #8A98A5;
 }
+
+.detalheTopo {
+    -fx-background-color: #12161A;
+    -fx-padding: 16px 24px 16px 24px;
+    -fx-spacing: 12px;
+    -fx-alignment: center-left;
+}
+
+.detalheTitulo {
+    -fx-font-family: "Comfortaa", "Segoe UI", sans-serif;
+    -fx-font-size: 17px;
+    -fx-text-fill: #FFFFFF;
+}
+
+.detalheSubtitulo {
+    -fx-font-size: 12px;
+    -fx-text-fill: #93A1AE;
+}
+
+.seloAberto {
+    -fx-background-color: #FDEBD8;
+    -fx-text-fill: #A84803;
+    -fx-background-radius: 20px;
+    -fx-padding: 4px 12px 4px 12px;
+    -fx-font-size: 12px;
+}
+
+.seloFinalizado {
+    -fx-background-color: #DCEEF8;
+    -fx-text-fill: #00639A;
+    -fx-background-radius: 20px;
+    -fx-padding: 4px 12px 4px 12px;
+    -fx-font-size: 12px;
+}
+
+.painelDados {
+    -fx-background-color: #F6F8F9;
+    -fx-border-color: #E3E8EC;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 14px 16px 14px 16px;
+    -fx-spacing: 12px;
+}
+
+.campoLeitura,
+.campoLeitura:focused {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-effect: null;
+    -fx-padding: 2px 0 0 0;
+    -fx-font-size: 14px;
+    -fx-text-fill: #12161A;
+}

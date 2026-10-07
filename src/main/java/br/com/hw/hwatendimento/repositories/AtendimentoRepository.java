@@ -33,6 +33,20 @@ public class AtendimentoRepository {
         return atendimento;
     }
 
+    // Finaliza um atendimento em aberto. Devolve false se ele ja tiver sido finalizado por outra pessoa
+    public boolean finalizarAtendimento(Connection conexao, Atendimento atendimento) throws SQLException {
+        String sql = "update atendimento set data_hora_fim = ?, descricao = ? where id = ? and data_hora_fim is null";
+
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setObject(1, atendimento.getDataHoraFim());
+            stmt.setString(2, atendimento.getDescricao());
+            stmt.setInt(3, atendimento.getId());
+
+            int linhasAlteradas = stmt.executeUpdate();
+            return linhasAlteradas == 1;
+        }
+    }
+
     public List<Atendimento> buscaPorEquipamento(Connection conexao, int equipamentoId) throws SQLException {
         String sql = "select * from atendimento where equipamento_id = ? order by data_hora_inicio desc";
         //Cria uma lista pra guardar obejetos apenas da classe atendimento

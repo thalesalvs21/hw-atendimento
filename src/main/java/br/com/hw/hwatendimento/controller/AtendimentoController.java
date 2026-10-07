@@ -18,6 +18,13 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javafx.concurrent.Task;
+import br.com.hw.hwatendimento.HWApplication;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import java.io.IOException;
 
 public class AtendimentoController {
     @FXML private TextField txtNumeroSerie, txtEmpresa, txtNome, txtTelefone, txtHoraFim, txtHoraInicio;
@@ -200,6 +207,13 @@ public class AtendimentoController {
                 lblDescricao.setMaxWidth(Double.MAX_VALUE);
 
                 bloco.getStyleClass().add("historicoItem");
+
+                // duplo clique abre o atendimento no formulario
+                bloco.setOnMouseClicked(evento -> {
+                    if (evento.getClickCount() == 2) {
+                        carregarAtendimento(atendimento);
+                    }
+                });
             }
         });
 
@@ -209,6 +223,35 @@ public class AtendimentoController {
         });
 
         new Thread(tarefa).start();
+    }
+
+    private void carregarAtendimento(Atendimento atendimento) {
+        try {
+            FXMLLoader loader = new FXMLLoader(HWApplication.class.getResource("detalhe-atendimento-view.fxml"));
+            Scene cena = new Scene(loader.load());
+
+            // Entrega o atendimento clicado para a janela nova
+            DetalheAtendimentoController detalhe = loader.getController();
+            detalhe.setDados(atendimento, equipamentoAtual);
+
+            Stage janela = new Stage();
+            janela.setScene(cena);
+            janela.setTitle("Atendimento");
+            janela.getIcons().add(new Image(getClass().getResourceAsStream("/br/com/hw/hwatendimento/assets/icone-32.png")));
+            janela.setResizable(false);
+
+            janela.initOwner(txtNumeroSerie.getScene().getWindow());
+            janela.initModality(Modality.APPLICATION_MODAL);
+
+            janela.showAndWait();
+
+            if (detalhe.foiFinalizado()) {
+                buscarEquipamento();
+            }
+
+        } catch (IOException ex) {
+            mensagem("✖ Erro ao abrir o atendimento", "mensagemErro");
+        }
     }
 
     private void limpaResultado(){

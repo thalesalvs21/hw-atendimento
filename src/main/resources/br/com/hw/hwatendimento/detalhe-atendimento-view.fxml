@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefWidth="580.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.hw.hwatendimento.controller.DetalheAtendimentoController">
+
+    <top>
+        <HBox styleClass="detalheTopo">
+            <children>
+                <VBox spacing="2.0">
+                    <children>
+                        <Label styleClass="detalheTitulo" text="Atendimento"/>
+                        <Label styleClass="detalheSubtitulo" text="Detalhes do registro"/>
+                    </children>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblStatus"/>
+            </children>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="10.0" styleClass="formulario">
+            <children>
+
+                <!-- Dados fixos: so leitura -->
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <children>
+                        <Label styleClass="tituloSecao" text="Dados"/>
+                        <Separator HBox.hgrow="ALWAYS"/>
+                    </children>
+                </HBox>
+
+                <VBox styleClass="painelDados">
+                    <children>
+                        <HBox spacing="16.0">
+                            <children>
+                                <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label styleClass="rotuloCampo" text="Cliente"/>
+                                        <TextField fx:id="txtCliente" editable="false" focusTraversable="false" styleClass="campoLeitura"/>
+                                    </children>
+                                </VBox>
+                                <VBox spacing="2.0" prefWidth="150.0">
+                                    <children>
+                                        <Label styleClass="rotuloCampo" text="Telefone"/>
+                                        <TextField fx:id="txtTelefone" editable="false" focusTraversable="false" styleClass="campoLeitura"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                        <HBox spacing="16.0">
+                            <children>
+                                <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label styleClass="rotuloCampo" text="Nº de série"/>
+                                        <TextField fx:id="txtSerie" editable="false" focusTraversable="false" styleClass="campoLeitura"/>
+                                    </children>
+                                </VBox>
+                                <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label styleClass="rotuloCampo" text="Modelo"/>
+                                        <TextField fx:id="txtModelo" editable="false" focusTraversable="false" styleClass="campoLeitura"/>
+                                    </children>
+                                </VBox>
+                                <VBox spacing="2.0" prefWidth="150.0">
+                                    <children>
+                                        <Label styleClass="rotuloCampo" text="Início"/>
+                                        <TextField fx:id="txtInicio" editable="false" focusTraversable="false" styleClass="campoLeitura"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <!-- Finalizacao: editavel so se estiver em aberto -->
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <children>
+                        <Label styleClass="tituloSecao" text="Finalização"/>
+                        <Separator HBox.hgrow="ALWAYS"/>
+                    </children>
+                    <VBox.margin>
+                        <Insets top="8.0"/>
+                    </VBox.margin>
+                </HBox>
+
+                <Label styleClass="rotuloCampo" text="Fim"/>
+                <HBox spacing="8.0">
+                    <children>
+                        <DatePicker fx:id="dtFim" prefWidth="170.0"/>
+                        <TextField fx:id="txtHoraFim" prefWidth="80.0" promptText="hh:mm"/>
+                    </children>
+                </HBox>
+
+                <Label styleClass="rotuloCampo" text="Descrição"/>
+                <TextArea fx:id="txtDescricao" prefRowCount="5" wrapText="true"/>
+
+                <Label fx:id="lblMensagem" styleClass="mensagem" wrapText="true"/>
+            </children>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox styleClass="barraAcoes">
+            <children>
+                <Button fx:id="btnFechar" mnemonicParsing="false" onAction="#fechar" styleClass="botaoDiscreto" text="Fechar"/>
+                <Button fx:id="btnFinalizar" mnemonicParsing="false" onAction="#finalizar" styleClass="botaoPrincipal" text="Finalizar atendimento"/>
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>
