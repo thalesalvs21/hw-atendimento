@@ -472,3 +472,34 @@
     -fx-font-size: 14px;
     -fx-text-fill: #12161A;
 }
+
+.list-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D8DEE4;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 0;
+}
+
+.list-view .list-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #12161A;
+    -fx-padding: 8px 12px 8px 12px;
+    -fx-border-color: transparent transparent #EDF1F4 transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-cursor: hand;
+}
+
+.list-view .list-cell:empty {
+    -fx-border-color: transparent;
+    -fx-cursor: default;
+}
+
+.list-view .list-cell:filled:hover {
+    -fx-background-color: #F2F5F7;
+}
+
+.list-view .list-cell:filled:selected {
+    -fx-background-color: #E3F1FA;
+    -fx-text-fill: #12161A;
+}

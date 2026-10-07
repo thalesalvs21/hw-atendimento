@@ -96,7 +96,26 @@
                 </HBox>
 
                 <Label styleClass="rotuloCampo" text="Descrição"/>
-                <TextArea fx:id="txtDescricao" prefRowCount="5" wrapText="true"/>
+                <TextArea fx:id="txtDescricao" prefRowCount="4" wrapText="true"/>
+
+                <!-- Anexos -->
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <children>
+                        <Label styleClass="tituloSecao" text="Anexos"/>
+                        <Separator HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnAdicionarAnexo" mnemonicParsing="false" onAction="#adicionarAnexo" styleClass="botaoDiscreto" text="Adicionar"/>
+                    </children>
+                    <VBox.margin>
+                        <Insets top="8.0"/>
+                    </VBox.margin>
+                </HBox>
+
+                <ListView fx:id="lstAnexos" prefHeight="110.0">
+                    <placeholder>
+                        <Label styleClass="avisoVazio" text="Nenhum anexo."/>
+                    </placeholder>
+                </ListView>
+                <Label styleClass="notaPagina" text="Dê duplo clique num anexo para abrir."/>
 
                 <Label fx:id="lblMensagem" styleClass="mensagem" wrapText="true"/>
             </children>

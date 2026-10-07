@@ -45,4 +45,9 @@ public class Conexao {
                 config.getProperty("db.senha")
         );
     }
+
+    // devolve qualquer valor do config.properties (ex: "anexos.pasta")
+    public static String getConfig(String chave) {
+        return config.getProperty(chave);
+    }
 }
