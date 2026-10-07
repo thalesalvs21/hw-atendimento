@@ -41,5 +41,14 @@ create table if not exists atendimento(
     foreign key (cliente_id) references cliente(id)
 );
 
+create table if not exists usuario(
+  id int auto_increment primary key,
+  nome varchar(60) not null,
+  senha varchar(60) not null,
+  admin boolean not null default false,
+  ativo boolean not null default true,
+  criado_em datetime not null default current_timestamp,
+  unique key uk_usuario_nome (nome)
+);
 
 #alter table equipamento modify cliente_id int not null;

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefWidth="380.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.hw.hwatendimento.controller.LoginController">
+
+    <top>
+        <HBox styleClass="barraTopo">
+            <children>
+                <ImageView fitHeight="28.0" preserveRatio="true">
+                    <image>
+                        <Image url="@assets/logo-mobile.png" />
+                    </image>
+                </ImageView>
+                <Label styleClass="marca" text="Atendimento" />
+            </children>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="8.0" styleClass="formulario">
+            <padding>
+                <Insets top="20.0" right="24.0" bottom="12.0" left="24.0" />
+            </padding>
+            <children>
+                <Label styleClass="tituloPagina" text="Entrar" />
+
+                <Label styleClass="rotuloCampo" text="Usuário" />
+                <ComboBox fx:id="cmbUsuario" maxWidth="Infinity" promptText="Selecione" />
+
+                <Label styleClass="rotuloCampo" text="Senha" />
+                <HBox spacing="6.0">
+                    <children>
+                        <StackPane HBox.hgrow="ALWAYS">
+                            <children>
+                                <PasswordField fx:id="txtSenha" />
+                                <TextField fx:id="txtSenhaVisivel" visible="false" managed="false" />
+                            </children>
+                        </StackPane>
+                        <Button fx:id="btnOlho" mnemonicParsing="false" onAction="#alternarSenha" styleClass="botaoDiscreto" text="👁" />
+                    </children>
+                </HBox>
+
+                <Label fx:id="lblMensagem" styleClass="mensagem" wrapText="true" />
+            </children>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="8.0" styleClass="barraAcoes">
+            <padding>
+                <Insets top="12.0" right="24.0" bottom="16.0" left="24.0" />
+            </padding>
+            <children>
+                <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#cancelar" styleClass="botaoDiscreto" text="Cancelar" />
+                <Button fx:id="btnOk" defaultButton="true" mnemonicParsing="false" onAction="#entrar" styleClass="botaoPrincipal" text="OK" />
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>
