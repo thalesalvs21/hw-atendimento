@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="720.0" prefWidth="1040.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.hw.hwatendimento.controller.AuditoriaController">
+    <top>
+        <HBox styleClass="barraTopo">
+            <children>
+                <ImageView fitHeight="28.0" preserveRatio="true">
+                    <image>
+                        <Image url="@assets/logo-mobile.png"/>
+                    </image>
+                </ImageView>
+                <Label styleClass="marca" text="Atendimento"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button mnemonicParsing="false" onAction="#abrirUsuarios" styleClass="botaoBarraTopo" text="Usuários"/>
+                <Button mnemonicParsing="false" onAction="#voltar" styleClass="botaoBarraTopo" text="Novo atendimento"/>
+            </children>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="10.0" styleClass="formulario">
+            <children>
+                <Label styleClass="tituloPagina" text="Log de auditoria"/>
+                <Label styleClass="notaPagina" text="Os 500 registros mais recentes: logins, criações e finalizações de atendimento."/>
+
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <children>
+                        <Label styleClass="tituloSecao" text="Registros"/>
+                        <Separator HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblTotal" styleClass="barraTopoInfo"/>
+                        <Button fx:id="btnAtualizar" mnemonicParsing="false" onAction="#atualizar" styleClass="botaoDiscreto" text="Atualizar"/>
+                    </children>
+                    <VBox.margin>
+                        <Insets top="10.0"/>
+                    </VBox.margin>
+                </HBox>
+
+                <TableView fx:id="tblLog" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colData" prefWidth="140.0" text="Data e hora"/>
+                        <TableColumn fx:id="colUsuario" prefWidth="140.0" text="Usuário"/>
+                        <TableColumn fx:id="colAcao" prefWidth="110.0" text="Ação"/>
+                        <TableColumn fx:id="colAtendimento" prefWidth="100.0" text="Atendimento"/>
+                        <TableColumn fx:id="colDetalhe" prefWidth="300.0" text="Detalhe"/>
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                </TableView>
+
+                <Label fx:id="lblMensagem" styleClass="mensagem"/>
+            </children>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox styleClass="barraAcoes">
+            <children>
+                <Button mnemonicParsing="false" onAction="#voltar" styleClass="botaoDiscreto" text="Voltar"/>
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>

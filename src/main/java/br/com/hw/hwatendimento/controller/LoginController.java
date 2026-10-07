@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.List;
+import br.com.hw.hwatendimento.repositories.AuditoriaRepository;
 
 public class LoginController {
     @FXML private ComboBox<Usuario> cmbUsuario;
@@ -83,7 +84,14 @@ public class LoginController {
             protected Usuario call() throws Exception {
                 try (Connection conexao = Conexao.conectar()) {
                     UsuarioRepository repo = new UsuarioRepository();
-                    return repo.autenticar(conexao, escolhido.getId(), senha);
+                    Usuario usuario = repo.autenticar(conexao, escolhido.getId(), senha);
+
+                    // senha certa, registra o login no log
+                    if (usuario != null) {
+                        AuditoriaRepository auditoria = new AuditoriaRepository();
+                        auditoria.registrar(conexao, usuario.getId(), "LOGIN", null, null);
+                    }
+                    return usuario;
                 }
             }
         };

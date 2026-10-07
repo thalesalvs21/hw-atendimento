@@ -82,6 +82,10 @@ public class UsuarioController {
     private void abrirPesquisa() {
         Navegacao.trocarTela(tblUsuarios, "pesquisa-view.fxml");
     }
+    @FXML
+    private void abrirLog() {
+        Navegacao.trocarTela(tblUsuarios, "auditoria-view.fxml");
+    }
 
     @FXML
     private void cadastrar() {
