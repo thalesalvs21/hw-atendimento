@@ -1,6 +1,7 @@
 package br.com.hw.hwatendimento.controller;
 import br.com.hw.hwatendimento.util.Mascaras;
 import br.com.hw.hwatendimento.util.Navegacao;
+import br.com.hw.hwatendimento.util.Sessao;
 import br.com.hw.hwatendimento.util.ValidadorSerie;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,12 +29,17 @@ public class AtendimentoController {
     @FXML private DatePicker dtInicio, dtFim;
     @FXML private VBox boxHistorico;
     @FXML private Button btnBuscar, btnSalvar;
+    @FXML private Button btnIrUsuarios;
     private List<Atendimento> historicoCarregado;
     private Equipamento equipamentoAtual;
 
     @FXML
     private void abrirPesquisa() {
         Navegacao.trocarTela(txtNumeroSerie, "pesquisa-view.fxml");
+    }
+    @FXML
+    private void abrirUsuarios() {
+        Navegacao.trocarTela(txtNumeroSerie, "usuario-view.fxml");
     }
 
     private void aplicarModeloPelaSerie(String numeroSerie) {
@@ -88,6 +94,9 @@ public class AtendimentoController {
 
     @FXML
     private void initialize(){
+        btnIrUsuarios.setVisible(Sessao.isAdmin());
+        btnIrUsuarios.setManaged(Sessao.isAdmin());
+
         Mascaras.serie(txtNumeroSerie);
         Mascaras.telefone(txtTelefone);
         Mascaras.hora(txtHoraInicio);

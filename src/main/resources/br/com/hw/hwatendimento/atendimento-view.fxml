@@ -19,6 +19,7 @@
                 <Label styleClass="marca" text="Atendimento" />
                 <Region HBox.hgrow="ALWAYS" />
                 <Button fx:id="btnIrPesquisa" mnemonicParsing="false" onAction="#abrirPesquisa" styleClass="botaoBarraTopo" text="Pesquisar" />
+                <Button fx:id="btnIrUsuarios" mnemonicParsing="false" onAction="#abrirUsuarios" styleClass="botaoBarraTopo" text="Usuários" />
                 <Label fx:id="lblDataHora" styleClass="barraTopoInfo" text="" />
             </children>
         </HBox>

@@ -14,7 +14,7 @@ public class HWApplication extends Application {
     public void start(Stage stage) throws IOException {
         Font.loadFont(getClass().getResourceAsStream("/br/com/hw/hwatendimento/assets/Comfortaa-Regular.ttf"), 12);
         Font.loadFont(getClass().getResourceAsStream("/br/com/hw/hwatendimento/assets/Comfortaa-Bold.ttf"), 12);
-        FXMLLoader fxmlLoader = new FXMLLoader(HWApplication.class.getResource("atendimento-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(HWApplication.class.getResource("login-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("HW Atendimento");
         stage.getIcons().addAll(
@@ -24,6 +24,7 @@ public class HWApplication extends Application {
                 new Image(getClass().getResourceAsStream("/br/com/hw/hwatendimento/assets/icone-256.png"))
         );
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.show();
     }
 }

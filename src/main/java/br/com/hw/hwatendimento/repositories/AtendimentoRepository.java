@@ -141,7 +141,7 @@ public class AtendimentoRepository {
 
 
 
-    public static void main(String[] args) throws SQLException {
+   /* public static void main(String[] args) throws SQLException {
         // Busca pelo numero de serie e pega o id do equipamento
         EquipamentoRepository eRepo = new EquipamentoRepository();
         Equipamento equipamento = eRepo.buscaNumeroSerie(Conexao.conectar(), "TE100909999");
@@ -155,7 +155,7 @@ public class AtendimentoRepository {
         } else {
             System.out.println("Equipamento não encontrado");
         }
-        /* Testa insert atendimento
+        Testa insert atendimento
         //Cria o cliente
         Cliente cliente = new Cliente();
         cliente.setNome("Teste3");
@@ -197,6 +197,7 @@ public class AtendimentoRepository {
         repo.inserirAtendimento(Conexao.conectar(), atendimento);
 
         System.out.println(atendimento.getId());
-        */
+
     }
+    */
 }

@@ -7,6 +7,7 @@ import br.com.hw.hwatendimento.repositories.AtendimentoRepository;
 import br.com.hw.hwatendimento.repositories.Conexao;
 import br.com.hw.hwatendimento.util.Mascaras;
 import br.com.hw.hwatendimento.util.Navegacao;
+import br.com.hw.hwatendimento.util.Sessao;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
@@ -26,9 +27,12 @@ public class PesquisaController {
     @FXML private TableView<Atendimento> tblResultados;
     @FXML private TableColumn<Atendimento, String> colData, colModelo, colSerie, colCliente, colTelefone, colDuracao, colDescricao;
     @FXML private Button btnPesquisar;
+    @FXML private Button btnIrUsuarios;
 
     @FXML
     private void initialize() {
+        btnIrUsuarios.setVisible(Sessao.isAdmin());
+        btnIrUsuarios.setManaged(Sessao.isAdmin());
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
         // Ensina a tabela o que mostrar em cada coluna: o que esta entre
@@ -135,5 +139,10 @@ public class PesquisaController {
     @FXML
     private void voltar(){
         Navegacao.trocarTela(txtNomeFiltro, "atendimento-view.fxml");
+    }
+
+    @FXML
+    private void abrirUsuarios() {
+        Navegacao.trocarTela(txtNomeFiltro, "usuario-view.fxml");
     }
 }

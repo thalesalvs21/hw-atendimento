@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="720.0" prefWidth="1040.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.hw.hwatendimento.controller.UsuarioController">
+    <top>
+        <HBox styleClass="barraTopo">
+            <children>
+                <ImageView fitHeight="28.0" preserveRatio="true">
+                    <image>
+                        <Image url="@assets/logo-mobile.png"/>
+                    </image>
+                </ImageView>
+                <Label styleClass="marca" text="Atendimento"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnIrPesquisa" mnemonicParsing="false" onAction="#abrirPesquisa" styleClass="botaoBarraTopo" text="Pesquisar" />
+                <Button fx:id="btnIrCadastro" mnemonicParsing="false" onAction="#voltar" styleClass="botaoBarraTopo" text="Novo atendimento"/>
+            </children>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox styleClass="formulario">
+            <children>
+                <Label styleClass="tituloPagina" text="Usuários"/>
+                <Label styleClass="notaPagina" text="Usuários desativados não aparecem no login, mas o histórico deles é mantido."/>
+
+                <HBox spacing="24.0" VBox.vgrow="ALWAYS">
+                    <VBox.margin>
+                        <Insets top="14.0"/>
+                    </VBox.margin>
+                    <children>
+
+                        <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <children>
+                                        <Label styleClass="tituloSecao" text="Cadastrados"/>
+                                        <Separator HBox.hgrow="ALWAYS"/>
+                                    </children>
+                                </HBox>
+
+                                <TableView fx:id="tblUsuarios" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="colNome" prefWidth="220.0" text="Nome"/>
+                                        <TableColumn fx:id="colAdmin" prefWidth="90.0" text="Admin"/>
+                                        <TableColumn fx:id="colAtivo" prefWidth="90.0" text="Ativo"/>
+                                    </columns>
+                                    <columnResizePolicy>
+                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                    </columnResizePolicy>
+                                </TableView>
+
+                                <HBox>
+                                    <children>
+                                        <Button fx:id="btnAlternarAtivo" mnemonicParsing="false" onAction="#alternarAtivo" styleClass="botaoSecundario" text="Ativar / Desativar"/>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <!-- Direita: formulario -->
+                        <VBox prefWidth="300.0" minWidth="280.0" spacing="8.0">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <children>
+                                        <Label styleClass="tituloSecao" text="Novo usuário"/>
+                                        <Separator HBox.hgrow="ALWAYS"/>
+                                    </children>
+                                    <VBox.margin>
+                                        <Insets bottom="4.0"/>
+                                    </VBox.margin>
+                                </HBox>
+
+                                <Label styleClass="rotuloCampo" text="Nome"/>
+                                <TextField fx:id="txtNome"/>
+
+                                <Label styleClass="rotuloCampo" text="Senha"/>
+                                <PasswordField fx:id="txtSenha"/>
+
+                                <CheckBox fx:id="chkAdmin" mnemonicParsing="false" text="Administrador">
+                                    <VBox.margin>
+                                        <Insets top="6.0"/>
+                                    </VBox.margin>
+                                </CheckBox>
+
+                                <Button fx:id="btnCadastrar" maxWidth="Infinity" mnemonicParsing="false" onAction="#cadastrar" styleClass="botaoPrincipal" text="Cadastrar">
+                                    <VBox.margin>
+                                        <Insets top="10.0"/>
+                                    </VBox.margin>
+                                </Button>
+
+                                <Label fx:id="lblMensagem" styleClass="mensagem" wrapText="true"/>
+                            </children>
+                        </VBox>
+
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox styleClass="barraAcoes">
+            <children>
+                <Button fx:id="btnVoltar" mnemonicParsing="false" onAction="#voltar" styleClass="botaoDiscreto" text="Voltar"/>
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>

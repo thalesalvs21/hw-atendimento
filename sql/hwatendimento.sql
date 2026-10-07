@@ -51,4 +51,29 @@ create table if not exists usuario(
   unique key uk_usuario_nome (nome)
 );
 
-#alter table equipamento modify cliente_id int not null;
+create table if not exists auditoria(
+    id int auto_increment primary key,
+    usuario_id int not null,
+    acao varchar(20) not null,
+    atendimento_id int null,
+    detalhe varchar(255) null,
+    criado_em datetime not null default current_timestamp,
+    constraint ck_auditoria_acao check (acao in ('LOGIN','CRIACAO','EDICAO','EXCLUSAO')),
+    index ix_auditoria_data (criado_em),
+    constraint fk_auditoria_usuario
+    foreign key (usuario_id) references usuario(id)
+);
+
+create table if not exists anexo(
+    id int auto_increment primary key,
+    atendimento_id int not null,
+    nome_arquivo varchar(255) not null,
+    caminho varchar(500) not null,
+    usuario_id int not null,
+    criado_em datetime not null default current_timestamp,
+    index ix_anexo_atendimento (atendimento_id),
+    constraint fk_anexo_atendimento
+    foreign key (atendimento_id) references atendimento(id),
+    constraint fk_anexo_usuario
+    foreign key (usuario_id) references usuario(id)
+);
