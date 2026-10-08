@@ -86,6 +86,10 @@ public class UsuarioController {
     private void abrirLog() {
         Navegacao.trocarTela(tblUsuarios, "auditoria-view.fxml");
     }
+    @FXML
+    private void abrirImportacao() {
+        Navegacao.trocarTela(tblUsuarios, "importacao-view.fxml");
+    }
 
     @FXML
     private void cadastrar() {

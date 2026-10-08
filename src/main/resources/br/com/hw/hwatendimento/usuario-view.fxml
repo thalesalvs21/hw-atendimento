@@ -18,6 +18,7 @@
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button fx:id="btnIrPesquisa" mnemonicParsing="false" onAction="#abrirPesquisa" styleClass="botaoBarraTopo" text="Pesquisar" />
                 <Button mnemonicParsing="false" onAction="#abrirLog" styleClass="botaoBarraTopo" text="Log"/>
+                <Button mnemonicParsing="false" onAction="#abrirImportacao" styleClass="botaoBarraTopo" text="Importar"/>
                 <Button fx:id="btnIrCadastro" mnemonicParsing="false" onAction="#voltar" styleClass="botaoBarraTopo" text="Novo atendimento"/>
             </children>
         </HBox>

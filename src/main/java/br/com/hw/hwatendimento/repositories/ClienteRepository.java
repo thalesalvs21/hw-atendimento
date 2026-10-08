@@ -49,6 +49,28 @@ public class ClienteRepository {
         return cliente;
     }
 
+    // Procura um cliente pelo telefone (so digitos). Devolve null se nao achar
+    public Cliente buscaPorTelefone(Connection conexao, String telefone) throws SQLException {
+        String sql = "select * from cliente where telefone = ? order by id limit 1";
+        Cliente cliente = null;
+
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setString(1, telefone);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    cliente = new Cliente();
+                    cliente.setId(rs.getInt("id"));
+                    cliente.setTipo(rs.getString("tipo"));
+                    cliente.setNome(rs.getString("nome"));
+                    cliente.setNomeEmpresa(rs.getString("nome_empresa"));
+                    cliente.setTelefone(rs.getString("telefone"));
+                    cliente.setCriadoEm(rs.getObject("criado_em", LocalDateTime.class));
+                }
+            }
+        }
+        return cliente;
+    }
+
 
     public static void main(String[] args) throws SQLException {
         // cria o cliente primeiro e depois roda o insert

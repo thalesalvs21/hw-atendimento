@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="720.0" prefWidth="1040.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.com.hw.hwatendimento.controller.ImportacaoController">
+    <top>
+        <HBox styleClass="barraTopo">
+            <children>
+                <ImageView fitHeight="28.0" preserveRatio="true">
+                    <image>
+                        <Image url="@assets/logo-mobile.png"/>
+                    </image>
+                </ImageView>
+                <Label styleClass="marca" text="Atendimento"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button mnemonicParsing="false" onAction="#abrirUsuarios" styleClass="botaoBarraTopo" text="Usuários"/>
+                <Button mnemonicParsing="false" onAction="#voltar" styleClass="botaoBarraTopo" text="Novo atendimento"/>
+            </children>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="10.0" styleClass="formulario">
+            <children>
+                <Label styleClass="tituloPagina" text="Importar clientes e equipamentos"/>
+                <Label styleClass="notaPagina" text="Cadastra vários equipamentos de uma vez a partir de uma planilha."/>
+
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <children>
+                        <Label styleClass="tituloSecao" text="Como montar a planilha"/>
+                        <Separator HBox.hgrow="ALWAYS"/>
+                    </children>
+                    <VBox.margin>
+                        <Insets top="10.0"/>
+                    </VBox.margin>
+                </HBox>
+
+                <VBox spacing="6.0" styleClass="painelDados">
+                    <children>
+                        <Label wrapText="true" text="1. Colunas, nesta ordem: Nº de série  •  Tipo (F ou J)  •  Nome do contato  •  Nome da empresa (só se for J)  •  Telefone"/>
+                        <Label wrapText="true" text="2. A primeira linha é o cabeçalho, com os nomes das colunas. Ela é ignorada na importação."/>
+                        <Label wrapText="true" text="3. Uma linha por equipamento. Se o cliente tiver mais de um, repita os dados dele em cada linha, com o telefone igual."/>
+                        <Label wrapText="true" text="4. Telefone com DDD, um por célula, sem texto junto. Pode ser com ou sem parênteses e traço."/>
+                        <Label wrapText="true" text="5. O modelo é preenchido automaticamente pelo número de série. Séries já cadastradas são ignoradas."/>
+                        <Label wrapText="true" text="6. No Excel, salve em: Arquivo → Salvar como → CSV UTF-8 (delimitado por vírgulas)."/>
+                    </children>
+                </VBox>
+
+                <!-- Escolher e importar -->
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <children>
+                        <Label styleClass="tituloSecao" text="Arquivo"/>
+                        <Separator HBox.hgrow="ALWAYS"/>
+                    </children>
+                    <VBox.margin>
+                        <Insets top="10.0"/>
+                    </VBox.margin>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <children>
+                        <Button fx:id="btnEscolher" mnemonicParsing="false" onAction="#escolherArquivo" styleClass="botaoSecundario" text="Escolher arquivo"/>
+                        <Label fx:id="lblArquivo" styleClass="notaPagina" text="Nenhum arquivo escolhido" HBox.hgrow="ALWAYS"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnImportar" disable="true" mnemonicParsing="false" onAction="#importar" styleClass="botaoPrincipal" text="Importar"/>
+                    </children>
+                </HBox>
+
+                <!-- Resultado -->
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <children>
+                        <Label styleClass="tituloSecao" text="Resultado"/>
+                        <Separator HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblResumo" styleClass="barraTopoInfo"/>
+                    </children>
+                    <VBox.margin>
+                        <Insets top="10.0"/>
+                    </VBox.margin>
+                </HBox>
+
+                <ListView fx:id="lstErros" VBox.vgrow="ALWAYS">
+                    <placeholder>
+                        <Label styleClass="avisoVazio" text="Nenhum erro para mostrar."/>
+                    </placeholder>
+                </ListView>
+
+                <Label fx:id="lblMensagem" styleClass="mensagem" wrapText="true"/>
+            </children>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox styleClass="barraAcoes">
+            <children>
+                <Button mnemonicParsing="false" onAction="#voltar" styleClass="botaoDiscreto" text="Voltar"/>
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>
