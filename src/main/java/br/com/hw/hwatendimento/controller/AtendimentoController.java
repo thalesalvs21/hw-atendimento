@@ -25,6 +25,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.time.format.DateTimeParseException;
 
 public class AtendimentoController {
     @FXML private TextField txtNumeroSerie, txtEmpresa, txtNome, txtTelefone, txtHoraFim, txtHoraInicio;
@@ -61,7 +62,7 @@ public class AtendimentoController {
     }
 
     private void mensagem(String mensagem, String classe){
-        lblResultadoBusca.getStyleClass().removeAll("mensagemSucesso", "mensagemErro");
+        lblResultadoBusca.getStyleClass().removeAll("mensagemSucesso", "mensagemErro", "mensagemCarregando");
         lblResultadoBusca.setText(mensagem);
         lblResultadoBusca.getStyleClass().add(classe);
     }
@@ -302,7 +303,9 @@ public class AtendimentoController {
                 equipamentoAtual = tarefa.getValue();
 
                 if (equipamentoAtual != null) {
-                    buscarEquipamento();
+                    // Serie ja existe: preenche so o cliente, sem limpar descricao e datas
+                    preencherCliente(numeroSerie);
+                    mensagem("Equipamento já cadastrado: dados do cliente preenchidos. Confira e clique em Salvar novamente.", "mensagemSucesso");
                     return;
                 }
                 continuarSalvamento(numeroSerie);
@@ -320,13 +323,38 @@ public class AtendimentoController {
         continuarSalvamento(numeroSerie);
     }
 
+    // preenche os campos do cliente a partir do equipamento encontrado, sem mexer no resto do formulario
+    private void preencherCliente(String numeroSerie) {
+        Cliente cliente = equipamentoAtual.getCliente();
+        aplicarModeloPelaSerie(numeroSerie);
+
+        txtNome.setText(cliente.getNome());
+        txtTelefone.setText(cliente.getTelefone());
+
+        if ("J".equals(cliente.getTipo())) {
+            rbJuridica.setSelected(true);
+            txtEmpresa.setText(cliente.getNomeEmpresa());
+        } else {
+            rbFisica.setSelected(true);
+            txtEmpresa.setText(null);
+        }
+    }
+
     private void continuarSalvamento(String numeroSerie) {
         if (!validadorCampo()){
             return;
         }
 
         LocalDate dataI = dtInicio.getValue();
-        LocalTime horaI = LocalTime.parse(txtHoraInicio.getText());
+
+        // hora de inicio invalida (ex.: 25:99) avisa em vez de travar
+        LocalTime horaI;
+        try {
+            horaI = LocalTime.parse(txtHoraInicio.getText());
+        } catch (DateTimeParseException ex) {
+            mensagem("✖ Hora de início inválida", "mensagemErro");
+            return;
+        }
         LocalDateTime inicio = dataI.atTime(horaI);
         LocalDateTime fim = null;
 
@@ -335,10 +363,31 @@ public class AtendimentoController {
             return;
         }
 
-        if (dtFim.getValue() != null && txtHoraFim.getText().length() == 5) {
-            LocalDate dataF = dtFim.getValue();
-            LocalTime horaF = LocalTime.parse(txtHoraFim.getText());
-            fim = dataF.atTime(horaF);
+        // NOVO: data do fim sem hora (ou hora sem data) avisa, em vez de ignorar o fim
+        boolean temDataFim = dtFim.getValue() != null;
+        boolean temHoraFim = !txtHoraFim.getText().isBlank();
+
+        if (temDataFim != temHoraFim) {
+            mensagem("✖ Preencha a data e a hora do fim, ou deixe os dois em branco", "mensagemErro");
+            return;
+        }
+
+        if (temDataFim) {
+            // hora de fim invalida
+            LocalTime horaF;
+            try {
+                horaF = LocalTime.parse(txtHoraFim.getText());
+            } catch (DateTimeParseException ex) {
+                mensagem("✖ Hora de fim inválida", "mensagemErro");
+                return;
+            }
+            fim = dtFim.getValue().atTime(horaF);
+
+            // NOVO: fim antes do inicio
+            if (fim.isBefore(inicio)) {
+                mensagem("✖ O fim não pode ser antes do início", "mensagemErro");
+                return;
+            }
         }
 
         // os objetos sao montados aqui, lendo a tela, porque dentro da tarefa nao se pode acessar componente de tela
