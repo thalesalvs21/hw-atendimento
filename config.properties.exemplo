@@ -1,5 +1,3 @@
 db.url=jdbc:mysql://ENDERECO_DO_SERVIDOR:3306/hwatendimento
 db.usuario=
 db.senha=
-
-anexos.pasta=//caminho-pasta/pasta

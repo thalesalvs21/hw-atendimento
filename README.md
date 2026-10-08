@@ -5,7 +5,7 @@ atendimento guarda o cliente, o equipamento, a data e hora de início e fim, e a
 descrição do que foi feito.
 
 O app roda instalado em cada máquina e acessa um MySQL num servidor da rede.
-Os anexos ficam numa pasta compartilhada no servidor de arquivos.
+Tudo fica nesse banco, inclusive os arquivos anexados.
 
 ## O que o app faz
 
@@ -63,27 +63,22 @@ Regras de organização:
 
 ## Configuração (`config.properties`)
 
-O endereço do banco e a pasta dos anexos ficam num arquivo `config.properties`,
+O endereço, o usuário e a senha do banco ficam num arquivo `config.properties`,
 fora do código:
 
 ```properties
 db.url=jdbc:mysql://IP_DO_SERVIDOR:3306/hwatendimento
 db.usuario=hwapp
 db.senha=senha-aqui
-anexos.pasta=//hwfs01/NOME-DO-COMPARTILHAMENTO
 ```
 
-O app procura esse arquivo na pasta em que é executado. No app instalado, ele vai
-junto pela pasta `dist` (veja "Gerar o instalador"). Rodando pelo IntelliJ, ele
-fica na raiz do projeto. O arquivo é lido **uma vez, quando o app abre**: depois
-de editar, feche e abra o app de novo.
+O app procura esse arquivo em dois lugares, nesta ordem: ao lado do executável
+(é o caso do app instalado) e, se não encontrar, na pasta atual (é o caso de
+rodar pelo IntelliJ, com o arquivo na raiz do projeto). O arquivo é lido **uma
+vez, quando o app abre**: depois de editar, feche e abra o app de novo.
 
-Para trocar de servidor, de senha ou de pasta de anexos, basta editar esse
-arquivo. Não é preciso recompilar nem reinstalar.
-
-Em `anexos.pasta`, use barras normais (`//servidor/pasta`). Com barras invertidas
-seria preciso escrever cada uma dobrada (`\\\\servidor\\pasta`), porque a `\` é
-um caractere especial nesse tipo de arquivo.
+Para trocar de servidor ou de senha, basta editar esse arquivo. Não é preciso
+recompilar nem reinstalar.
 
 O arquivo não vai para o repositório, porque contém a senha. O
 `config.properties.exemplo` serve de modelo.
@@ -99,7 +94,7 @@ Seis tabelas:
 | `atendimento` | Ligado ao equipamento e ao cliente |
 | `usuario` | Quem entra no app, se é admin e se está ativo |
 | `auditoria` | Log: logins, criações e finalizações |
-| `anexo` | Arquivos de cada atendimento (o banco guarda só o caminho) |
+| `anexo` | Arquivos de cada atendimento, guardados no próprio banco |
 
 ```
 mysql -u root -p < sql/hwatendimento.sql
@@ -116,6 +111,9 @@ Detalhes que não são óbvios:
 - `auditoria.atendimento_id` **não** tem chave estrangeira de propósito: o
   registro do log precisa continuar existindo mesmo se o atendimento um dia for
   apagado.
+- `anexo.conteudo` (`longblob`) guarda o arquivo inteiro. A coluna `caminho` é
+  de uma versão antiga, em que os arquivos ficavam numa pasta da rede, e fica
+  vazia nos anexos novos.
 - As senhas dos usuários ficam em texto puro. Foi uma decisão do projeto, porque o
   app só roda na rede interna.
 
@@ -173,34 +171,21 @@ escreveu.
 
 - Ficam na janela de detalhe do atendimento: **Adicionar** escolhe o arquivo, e
   **duplo clique** abre no programa padrão do Windows.
-- O arquivo é copiado para a pasta de `anexos.pasta` com um nome único
-  (`idDoAtendimento_momento_nomeOriginal`), e o banco guarda o caminho. Assim,
-  dois arquivos com o mesmo nome nunca se sobrescrevem.
+- O arquivo é gravado **dentro do banco**, na coluna `anexo.conteudo`. Por isso
+  qualquer PC que abre o app consegue anexar e abrir, esteja ou não no domínio:
+  não depende de pasta compartilhada nem de permissão do Windows.
+- Para abrir, o app busca o arquivo no banco, salva numa pasta temporária do PC
+  com o nome original e abre de lá.
+- A lista de anexos carrega só os nomes. O arquivo só é buscado no duplo clique,
+  para não trazer todos os arquivos pela rede ao abrir um atendimento.
 - Limite de **20 MB** por arquivo.
-- Se a gravação no banco falhar, o arquivo copiado é apagado, para não ficar
-  "órfão" na pasta.
+- O MySQL precisa aceitar envios desse tamanho: o `max_allowed_packet` do
+  servidor tem que ser de pelo menos 25 MB (veja "Preparar o servidor").
 
-### Permissão da pasta (importante)
-
-O app acessa a pasta com o **usuário do Windows de quem está logado no PC**. Por
-isso, no servidor de arquivos, a pasta compartilhada precisa dar acesso ao grupo
-**"Usuários do domínio"** nas **duas** abas das propriedades da pasta:
-
-1. **Compartilhamento → Compartilhamento Avançado → Permissões**: Alterar e
-   Leitura.
-2. **Segurança → Editar**: Modificar.
-
-O Windows aplica as duas e vale a mais restritiva. Se só uma estiver liberada, o
-anexo dá erro de acesso.
-
-Para testar num PC: abra `\\hwfs01\NOME-DO-COMPARTILHAMENTO` no Explorador. Tem
-que abrir **sem pedir senha**. Se pedir, o app também não vai conseguir anexar
-nesse PC. Casos conhecidos:
-
-- **PC com usuário local** (fora do domínio): não acessa a pasta.
-- **PC que já acessa o servidor com outro usuário** (por exemplo, um disco de rede
-  mapeado com um usuário diferente): o Windows usa esse usuário também para a
-  pasta dos anexos. Se ele não tiver permissão, pede senha.
+Por que no banco, e não numa pasta da rede: a primeira versão copiava os arquivos
+para uma pasta compartilhada, mas o acesso dependia do usuário do Windows de cada
+PC. PCs com usuário local, ou já conectados ao servidor com outro usuário, não
+conseguiam anexar.
 
 ## Importação de planilha
 
@@ -270,9 +255,14 @@ máquina do banco e falha em todas as outras. Também é preciso liberar a porta
 
 Depois, crie o primeiro admin (veja "Primeiro admin").
 
-**Pasta dos anexos.** No servidor de arquivos, crie a pasta direto num disco (por
-exemplo `C:\HWAnexos`, e não dentro da pasta de um usuário), compartilhe e dê as
-permissões descritas em "Permissão da pasta".
+**Tamanho dos anexos.** Confira o limite de envio do MySQL:
+
+```sql
+show variables like 'max_allowed_packet';
+```
+
+O valor aparece em bytes e precisa ser de pelo menos `26214400` (25 MB). No
+MySQL 8 o padrão é 64 MB, então normalmente já está certo.
 
 **Rodar SQL no servidor.** Se o `mysql` não for reconhecido no Prompt, ele fica
 em `C:\Program Files\MySQL\MySQL Server <versão>\bin`, ou use o atalho "MySQL
@@ -298,7 +288,7 @@ Tem que aparecer `BUILD SUCCESS`.
 ```
 dist/
 ├── HWAtendimento.jar       (copiado de target/, sempre o mais recente)
-└── config.properties       (apontando para o servidor, com a linha anexos.pasta)
+└── config.properties       (já apontando para o servidor)
 ```
 
 Tudo que estiver em `dist` vai junto para dentro do app instalado.

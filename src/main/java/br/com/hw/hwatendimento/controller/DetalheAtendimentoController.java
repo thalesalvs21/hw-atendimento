@@ -22,12 +22,10 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import br.com.hw.hwatendimento.repositories.AuditoriaRepository;
 import br.com.hw.hwatendimento.util.Sessao;
 import java.sql.SQLException;
-import javafx.application.Platform;
 import java.awt.Desktop;
 
 public class DetalheAtendimentoController {
@@ -175,13 +173,13 @@ public class DetalheAtendimentoController {
         dados.setDataHoraFim(fim);
         dados.setDescricao(txtDescricao.getText());
 
-        // NOVO: quem esta logado, para o log
+        // quem esta logado, para o log
         int usuarioId = Sessao.getUsuario().getId();
 
         mensagem("Salvando...", "mensagemCarregando");
         btnFinalizar.setDisable(true);
 
-        // agora com transacao, para o update e o log irem juntos
+        // transacao, para o update e o log irem juntos
         Task<Boolean> tarefa = new Task<>() {
             @Override
             protected Boolean call() throws Exception {
@@ -234,16 +232,10 @@ public class DetalheAtendimentoController {
         new Thread(tarefa).start();
     }
 
-    // escolhe um arquivo, copia para a pasta do servidor e grava no banco
+    // escolhe um arquivo e grava ele no banco
     @FXML
     private void adicionarAnexo() {
-        String pasta = Conexao.getConfig("anexos.pasta");
-        if (pasta == null || pasta.isBlank()) {
-            mensagem("✖ Pasta de anexos não configurada (anexos.pasta no config.properties)", "mensagemErro");
-            return;
-        }
-
-        // Janela padrao do Windows para escolher o arquivo
+        // janela padrao do windows para escolher o arquivo
         FileChooser escolha = new FileChooser();
         escolha.setTitle("Escolher anexo");
         escolha.getExtensionFilters().addAll(
@@ -252,12 +244,12 @@ public class DetalheAtendimentoController {
         );
         File arquivo = escolha.showOpenDialog(btnAdicionarAnexo.getScene().getWindow());
 
-        // A pessoa clicou em Cancelar
+        // a pessoa clicou em cancelar
         if (arquivo == null) {
             return;
         }
 
-        // Limite de 20 MB
+        // limite de 20 mb
         if (arquivo.length() > 20L * 1024 * 1024) {
             mensagem("✖ Arquivo maior que 20 MB", "mensagemErro");
             return;
@@ -267,18 +259,12 @@ public class DetalheAtendimentoController {
         int atendimentoId = atendimento.getId();
         int usuarioId = Sessao.getUsuario().getId();
 
-        // Nome unico na pasta: id do atendimento + momento atual + nome original
-        String nomeUnico = atendimentoId + "_" + System.currentTimeMillis() + "_" + nomeOriginal;
-        Path origem = arquivo.toPath();
-        Path destino = Paths.get(pasta, nomeUnico);
-
         Anexo anexo = new Anexo();
         anexo.setAtendimentoId(atendimentoId);
         anexo.setNomeArquivo(nomeOriginal);
-        anexo.setCaminho(destino.toString());
         anexo.setUsuarioId(usuarioId);
 
-        // O detalhe do log tem limite de 255 letras
+        // o detalhe do log tem limite de 255 letras
         String detalhe = "Anexou " + nomeOriginal;
         if (detalhe.length() > 255) {
             detalhe = detalhe.substring(0, 255);
@@ -291,17 +277,17 @@ public class DetalheAtendimentoController {
         Task<Void> tarefa = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                // Copia o arquivo para a pasta do servidor
-                Files.copy(origem, destino);
+                // 1. le o arquivo inteiro do pc
+                byte[] conteudo = Files.readAllBytes(arquivo.toPath());
 
-                // Grava no banco (anexo + log) numa transacao
+                // 2. grava no banco (anexo + log) numa transacao
                 Connection conexao = null;
                 try {
                     conexao = Conexao.conectar();
                     conexao.setAutoCommit(false);
 
                     AnexoRepository anexoRepo = new AnexoRepository();
-                    anexoRepo.inserirAnexo(conexao, anexo);
+                    anexoRepo.inserirAnexo(conexao, anexo, conteudo);
 
                     AuditoriaRepository auditoria = new AuditoriaRepository();
                     auditoria.registrar(conexao, usuarioId, "EDICAO", atendimentoId, detalheLog);
@@ -312,8 +298,6 @@ public class DetalheAtendimentoController {
                     if (conexao != null) {
                         try { conexao.rollback(); } catch (SQLException ex) { }
                     }
-                    // O banco falhou: apaga o arquivo copiado para nao ficar orfao na pasta
-                    Files.deleteIfExists(destino);
                     throw e;
 
                 } finally {
@@ -333,31 +317,54 @@ public class DetalheAtendimentoController {
 
         tarefa.setOnFailed(e -> {
             btnAdicionarAnexo.setDisable(false);
-            mensagem("✖ Erro ao anexar o arquivo. Verifique o acesso à pasta de anexos.", "mensagemErro");
+            mensagem("✖ Erro ao anexar o arquivo", "mensagemErro");
         });
 
         new Thread(tarefa).start();
     }
 
+    // busca o arquivo no banco, salva numa pasta temporaria do pc e abre
     private void abrirAnexo(Anexo anexo) {
-        File arquivo = new File(anexo.getCaminho());
-        mensagem("Abrindo " + anexo.getNomeArquivo() + "...", "mensagemCarregando");
+        int anexoId = anexo.getId();
+        String nome = anexo.getNomeArquivo();
+        mensagem("Abrindo " + nome + "...", "mensagemCarregando");
 
-        // O Desktop.open pode demorar (arquivo na rede), entao roda fora da tela
-        new Thread(() -> {
-            try {
-                if (!arquivo.exists()) {
-                    Platform.runLater(() -> mensagem("✖ Arquivo não encontrado na pasta de anexos", "mensagemErro"));
-                    return;
+        Task<Boolean> tarefa = new Task<>() {
+            @Override
+            protected Boolean call() throws Exception {
+                byte[] conteudo;
+                try (Connection conexao = Conexao.conectar()) {
+                    AnexoRepository repo = new AnexoRepository();
+                    conteudo = repo.buscarConteudo(conexao, anexoId);
                 }
-                Desktop.getDesktop().open(arquivo);
-                Platform.runLater(() -> mensagem("", "mensagem"));
 
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                Platform.runLater(() -> mensagem("✖ Não foi possível abrir o arquivo", "mensagemErro"));
+                // anexo sem arquivo no banco
+                if (conteudo == null) {
+                    return false;
+                }
+
+                // pasta temporaria nova, para o arquivo manter o nome original
+                Path pasta = Files.createTempDirectory("hwanexo");
+                Path arquivo = pasta.resolve(nome);
+                Files.write(arquivo, conteudo);
+
+                Desktop.getDesktop().open(arquivo.toFile());
+                return true;
             }
-        }).start();
-    }
+        };
 
+        tarefa.setOnSucceeded(e -> {
+            if (tarefa.getValue()) {
+                mensagem("", "mensagem");
+            } else {
+                mensagem("✖ Arquivo não encontrado", "mensagemErro");
+            }
+        });
+
+        tarefa.setOnFailed(e -> {
+            mensagem("✖ Não foi possível abrir o arquivo", "mensagemErro");
+        });
+
+        new Thread(tarefa).start();
+    }
 }
